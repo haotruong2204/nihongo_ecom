@@ -68,7 +68,7 @@ end
 
 group :test do
   # Use system testing
-  gem "shoulda-matchers", "~> 3.1"
+  gem "shoulda-matchers", "~> 6.5"
   gem "simplecov", require: false
 end
 
