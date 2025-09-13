@@ -60,7 +60,6 @@ group :development, :test do
   gem "faker", git: "https://github.com/faker-ruby/faker.git", branch: "main"
 end
 
-
 group :development do
   # Schema in model
   gem "annotate"
@@ -75,6 +74,11 @@ end
 # Environment variables
 gem "dotenv-rails"
 
+# Authentication
+gem "devise"
+gem "devise-jwt"
+gem "oauth"
+
 # Paginate
 gem "pagy"
 
@@ -83,9 +87,6 @@ gem "ransack"
 
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible
 gem "rack-cors"
-
-# Render error fields use with admin page
-gem "simple_form"
 
 # Strip attribute before commit
 gem "strip_attributes"

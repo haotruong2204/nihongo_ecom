@@ -3,10 +3,10 @@ en:
     common:
       success: Success
       fail: Fail
+      custom_code: Custom code
       create_success: Create resource successfully
       update_success: Update resource successfully
       delete_success: Delete resource successfully
-      save_success: Save resource successfully
     error:
       bad_request: Invalid input
       unauthorized: You must authenticate yourself before continue
@@ -18,3 +18,7 @@ en:
       need_password_change: You need to change your password first before continue
       some_references_not_found: Some references not found
       session_has_expired: Login session has expired!
+      invalid_xml: Invalid XML file
+      same_length: Graph metric options and selections must be the same length
+      route_not_found: Route not found
+      

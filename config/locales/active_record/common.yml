@@ -1,0 +1,53 @@
+en:
+  activerecord:
+    errors:
+      messages:
+        confirmation:
+        accepted:
+        blank: can't be empty
+        present: can't be present
+        too_short: is too short (minimum is %{count} characters)
+        too_long: is too long (maximum is %{count} characters)
+        wrong_length: is the wrong length (should be %{count} characters)
+        taken: is already taken
+        invalid: is invalid
+        inclusion:
+        exclusion:
+        required: is required
+        not_a_number: is not a number
+        greater_than: must be greater than %{count}
+        greater_than_or_equal_to: must be greater than or equal to %{count}
+        equal_to: must be equal to %{count}
+        less_than: must be less than %{count}
+        less_than_or_equal_to: must be less than or equal to %{count}
+        other_than: must be other than %{count}
+        not_an_integer: must be an integer
+        in:
+        odd:
+        even:
+        not_allow_delete: can't be deleted
+        cant_delete_because_has_related_records: Can't be deleted because it has related records
+        cant_edit_because_has_related_records: Can't be edited because it has related records
+        cant_edit_because_not_in_operation: Can't be edited because it is not in operation
+        cant_update_start_use_date_in_future: Can't update start use date in future
+        cant_edit_because_user_has_login: Can't be edited because user has login
+        cant_edit_if_sent: Can't be edited when sent
+        restrict_dependent_destroy:
+          has_many: Can't be deleted because it has related records
+        limit_exceeded: Limit exceeded
+        start_date_must_be_before_end_date: End date can't be before start date
+        record_invalid: "validation failed: %{errors}"
+        lower_limit_than_resources: limit of %{resource} must be greater or equal to %{limit}
+        not_found: "%{entity} not found"
+        maximum_graph_metric: Exceeded maximum number of options for this graph metric
+        one_of_the_two_fields: Must enter at least one of the two fields
+        number_of_float_digits: number of float digits must be less than or equal to %{count}
+        manual_measurement_values_invalid: Manual measurement values are invalid
+        can_not_edit_nh4_value: Can't edit NH4 value
+        can_not_delete_nh4_value: Can't delete NH4 value
+        blank_graph_metric_option: Please input graph metric option
+        blank_graph_metric_option_limit: Please input graph metric option limit
+        edit_event: Cannot edit the record when the status has been sent
+        destroy_event: Cannot delete the record when the status has been sent
+        invalid_enum_value: "%{value} is not a valid value for %{attribute}"
+  unit_name_for_count: times

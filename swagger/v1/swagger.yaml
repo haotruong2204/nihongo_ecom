@@ -1,0 +1,62 @@
+---
+openapi: 3.0.1
+info:
+  title: API V1
+  version: v1
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+paths:
+  "/api/v1/admins/sign_in":
+    post:
+      tags:
+        - Authentication
+      summary: admin sign_in
+      description: Art-ExChange admin sign in with email, password
+      requestBody:
+        description: admin object contains authentication properties like email,
+          password
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                admin:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      format: email
+                      example: test@gmail.com
+                    password:
+                      type: string
+                      format: password
+                      example: "1233456"
+        required: true
+      responses:
+        "200":
+          description: Successful sign in
+        "401":
+          description: Unauthorized - You must authenticate yourself before continuing
+        "422":
+          description: Unprocessable Entity - Server can't complete the request
+  "/api/v1/admins/sign_out":
+    delete:
+      tags:
+        - Authentication
+      summary: Sign out an admin
+      responses:
+        "200":
+          description: Successful sign out
+        "204":
+          description: No Content - The server successfully processed the request, but there is no content to send in the response.
+security:
+  - BearerAuth: []
+servers:
+  - url: http://localhost:3000
+    variables:
+      defaultHost:
+        default: localhost:3000
