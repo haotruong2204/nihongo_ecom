@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/faker-ruby/faker.git
-  revision: 232c561fbab14b5e06b760c0076faac57eb0827d
+  revision: 8fbda8de78d6827cae94bc2dee7dfa4d9a91f261
   branch: main
   specs:
     faker (3.5.2)
@@ -403,9 +403,6 @@ GEM
     securerandom (0.4.1)
     shoulda-matchers (3.1.3)
       activesupport (>= 4.0.0)
-    simple_form (5.3.1)
-      actionpack (>= 5.2)
-      activemodel (>= 5.2)
     simplecov (0.22.0)
       docile (~> 1.1)
       simplecov-html (~> 0.11)
@@ -514,7 +511,6 @@ DEPENDENCIES
   rubocop-rake
   rubocop-rspec
   shoulda-matchers (~> 3.1)
-  simple_form
   simplecov
   solid_cable
   solid_cache
