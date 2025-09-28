@@ -2,7 +2,7 @@ en:
   api:
     common:
       success: Success
-      fail: Fail
+      fail: Đã bảo không phận sự miễn vào rồi mà
       create_success: Create resource successfully
       update_success: Update resource successfully
       delete_success: Delete resource successfully

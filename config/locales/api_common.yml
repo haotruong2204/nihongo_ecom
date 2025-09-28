@@ -2,7 +2,7 @@ en:
   api:
     common:
       success: Success
-      fail: Fail
+      fail: Đã bảo không phận sự miễn vào rồi mà
       custom_code: Custom code
       create_success: Create resource successfully
       update_success: Update resource successfully
@@ -21,4 +21,3 @@ en:
       invalid_xml: Invalid XML file
       same_length: Graph metric options and selections must be the same length
       route_not_found: Route not found
-      
