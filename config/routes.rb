@@ -9,7 +9,7 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       namespace :admins do
-        get "home", to: "dashboard#home"
+        get "me", to: "dashboard#me"
       end
     end
   end

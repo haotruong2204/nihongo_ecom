@@ -1,7 +1,12 @@
 # frozen_string_literal: true
 
 class Api::V1::Admins::DashboardController < Api::V1::BaseController
-  def home
-    render json: { message: "Welcome to the Admin Dashboard" }, status: :ok
+  def me
+    response_success({
+                       code: 200,
+                       message: I18n.t("api.common.success"),
+                       resource: AdminSerializer.new(current_admin).serializable_hash,
+                       status: :ok
+                     })
   end
 end
