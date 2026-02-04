@@ -88,6 +88,9 @@ gem "ransack"
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible
 gem "rack-cors"
 
+# Rate limiting and throttling
+gem "rack-attack"
+
 # Strip attribute before commit
 gem "strip_attributes"
 
