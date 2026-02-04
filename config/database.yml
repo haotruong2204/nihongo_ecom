@@ -4,21 +4,21 @@ default: &default
   charset: utf8mb4
   collation: utf8mb4_unicode_ci
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  username: root
-  password: <%= ENV['NIHONGO_ECOM_DATABASE_PASSWORD'] %>
-  port: <%= ENV.fetch("DB_PORT") { 3306 } %>
+  username: <%= ENV.fetch("DB_USER", "root") %>
+  password: <%= ENV.fetch("NIHONGO_ECOM_DATABASE_PASSWORD", "password") %>
+  port: <%= ENV.fetch("DB_PORT", "3306").to_i %>
   host: <%= ENV.fetch("NIHONGO_ECOM_HOST", "db") %>
 
 development:
   primary:
     <<: *default
-    username: <%= ENV.fetch("DB_USER") { "root" } %>
     database: nihongo_ecom_development
+    # Use DATABASE_URL if available, otherwise use individual config above
+    url: <%= ENV['DATABASE_URL'] %>
 
 test:
   primary:
     <<: *default
-    username: <%= ENV.fetch("DB_USER") { "root" } %>
     database: nihongo_ecom_test
 
 staging:

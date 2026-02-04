@@ -1,33 +1,64 @@
-FROM ruby:3.3.4
+# Use Ruby 3.3.4 as base image
+FROM ruby:3.3.4-slim
 
+# Install system dependencies
 RUN apt-get update -qq && \
-    apt-get install -y build-essential libssl-dev nodejs libpq-dev less vim nano libsasl2-dev
+    apt-get install -y \
+    build-essential \
+    libssl-dev \
+    libpq-dev \
+    default-libmysqlclient-dev \
+    curl \
+    git \
+    ca-certificates \
+    gnupg \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
-RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
-RUN apt update && apt install yarn
+# Install Node.js and Yarn
+RUN mkdir -p /etc/apt/keyrings && \
+    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
+    echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_18.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list && \
+    apt-get update && \
+    apt-get install -y nodejs && \
+    npm install -g yarn && \
+    rm -rf /var/lib/apt/lists/*
 
-ENV WORK_ROOT /src
-ENV APP_HOME $WORK_ROOT/app/
-ENV LANG C.UTF-8
-ENV GEM_HOME $WORK_ROOT/bundle
-ENV BUNDLE_BIN $GEM_HOME/gems/bin
-ENV PATH $GEM_HOME/bin:$BUNDLE_BIN:$PATH
+# Set environment variables
+ENV RAILS_ENV=production
+ENV RACK_ENV=production
+ENV NODE_ENV=production
+ENV LANG=C.UTF-8
+ENV BUNDLE_JOBS=4
+ENV BUNDLE_RETRY=3
 
-RUN gem install bundler -v 2.5.19
+# Create app directory
+WORKDIR /app
 
-RUN mkdir -p $APP_HOME
+# Install gems
+COPY Gemfile Gemfile.lock ./
+RUN bundle config set --local deployment 'true' && \
+    bundle config set --local without 'development test' && \
+    bundle install && \
+    bundle clean --force
 
-RUN bundle config --path=$GEM_HOME
-RUN bundle config set force_ruby_platform true
+# Copy application code
+COPY . .
 
-WORKDIR $APP_HOME
+# Precompile assets
+RUN bundle exec rails assets:precompile
 
-ADD Gemfile ./
-ADD Gemfile.lock ./
-RUN bundle update --bundler
-RUN bundle install
+# Create a non-root user
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+RUN chown -R appuser:appuser /app
+USER appuser
 
-ADD . $APP_HOME
-
+# Expose port
 EXPOSE 3000
+
+# Add health check endpoint script
+COPY --chown=appuser:appuser docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+# Start the application
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0", "-p", "3000"]

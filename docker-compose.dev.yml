@@ -1,0 +1,105 @@
+# Docker Compose for Development Environment
+name: nihongo_ecom_dev
+
+services:
+  web:
+    build: 
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: nihongo_ecom_dev
+    command: bundle exec rails server -b 0.0.0.0 -p 3000
+    ports:
+      - "3000:3000"
+    environment:
+      - RAILS_ENV=development
+      - RACK_ENV=development
+      - DATABASE_URL=mysql2://root:password@db:3306/nihongo_ecom_development
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - .:/app
+      - bundle_cache:/usr/local/bundle
+      - node_modules:/app/node_modules
+      - tmp_data:/app/tmp
+      - log_data:/app/log
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    stdin_open: true
+    tty: true
+    networks:
+      - nihongo_network
+
+  db:
+    image: mysql:8.0.30
+    container_name: nihongo_ecom_dev_db
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: nihongo_ecom_development
+      MYSQL_CHARACTER_SET_SERVER: utf8mb4
+      MYSQL_COLLATION_SERVER: utf8mb4_unicode_ci
+    volumes:
+      - mysql_dev_data:/var/lib/mysql
+      - ./db/init:/docker-entrypoint-initdb.d
+    ports:
+      - "3310:3306"
+    command: >
+      mysqld 
+      --character-set-server=utf8mb4 
+      --collation-server=utf8mb4_unicode_ci
+      --bind-address=0.0.0.0
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    networks:
+      - nihongo_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: nihongo_ecom_dev_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_dev_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - nihongo_network
+
+  # Sidekiq for background jobs (development)
+  sidekiq:
+    build: 
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: nihongo_ecom_dev_sidekiq
+    command: bundle exec sidekiq
+    environment:
+      - RAILS_ENV=development
+      - DATABASE_URL=mysql2://root:password@db:3306/nihongo_ecom_development
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - .:/app
+      - bundle_cache:/usr/local/bundle
+    depends_on:
+      - db
+      - redis
+    networks:
+      - nihongo_network
+
+volumes:
+  mysql_dev_data:
+  redis_dev_data:
+  bundle_cache:
+  node_modules:
+  tmp_data:
+  log_data:
+
+networks:
+  nihongo_network:
+    driver: bridge

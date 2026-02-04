@@ -2,6 +2,9 @@ Rails.application.routes.draw do
   mount Rswag::Ui::Engine => "/api/docs"
   mount Rswag::Api::Engine => "/api/docs"
 
+  # Health check endpoint for load balancer
+  get "health", to: "health#index"
+
   devise_for :admins, path: "api/v1/admins", controllers: {
     sessions: "api/v1/admins/sessions"
   }
