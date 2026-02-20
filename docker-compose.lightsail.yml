@@ -1,0 +1,131 @@
+# Docker Compose for Lightsail Production ($5/month, 1GB RAM)
+# Optimized for low-memory: MySQL tuned, Puma single-mode, Redis maxmemory
+name: nihongo_ecom_prod
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nihongo_api
+    command: bundle exec puma -C config/puma.rb
+    env_file: .env.production
+    volumes:
+      - app_storage:/app/storage
+      - app_log:/app/log
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 350M
+    networks:
+      - app_network
+
+  db:
+    image: mysql:8.0.30
+    container_name: nihongo_db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${NIHONGO_ECOM_DATABASE_PASSWORD}
+      MYSQL_DATABASE: nihongo_ecom_production
+      MYSQL_USER: nihongo
+      MYSQL_PASSWORD: ${NIHONGO_ECOM_DATABASE_PASSWORD}
+      MYSQL_CHARACTER_SET_SERVER: utf8mb4
+      MYSQL_COLLATION_SERVER: utf8mb4_unicode_ci
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: >
+      mysqld
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --innodb-buffer-pool-size=128M
+      --innodb-log-file-size=32M
+      --max-connections=50
+      --key-buffer-size=16M
+      --table-open-cache=200
+      --sort-buffer-size=256K
+      --read-buffer-size=256K
+      --performance-schema=OFF
+      --bind-address=0.0.0.0
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-unihongo", "-p${NIHONGO_ECOM_DATABASE_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 300M
+    networks:
+      - app_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: nihongo_redis
+    command: redis-server --maxmemory 50mb --maxmemory-policy allkeys-lru --save ""
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 60M
+    networks:
+      - app_network
+
+  sidekiq:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nihongo_sidekiq
+    command: bundle exec sidekiq -c 2
+    env_file: .env.production
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 200M
+    networks:
+      - app_network
+
+  nginx:
+    image: nginx:alpine
+    container_name: nihongo_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - web
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 30M
+    networks:
+      - app_network
+
+volumes:
+  mysql_data:
+  app_storage:
+  app_log:
+
+networks:
+  app_network:
+    driver: bridge
