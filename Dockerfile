@@ -44,9 +44,6 @@ RUN bundle config set --local deployment 'true' && \
 # Copy application code
 COPY . .
 
-# Precompile assets
-RUN bundle exec rails assets:precompile
-
 # Create a non-root user
 RUN groupadd -r appuser && useradd -r -g appuser appuser
 RUN chown -R appuser:appuser /app
