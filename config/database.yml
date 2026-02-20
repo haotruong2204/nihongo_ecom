@@ -13,8 +13,6 @@ development:
   primary:
     <<: *default
     database: nihongo_ecom_development
-    # Use DATABASE_URL if available, otherwise use individual config above
-    url: <%= ENV['DATABASE_URL'] %>
 
 test:
   primary:
