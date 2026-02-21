@@ -11,8 +11,15 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
+      # User OAuth
+      namespace :users do
+        post "auth_google", to: "omniauths#auth_google"
+      end
+
+      # Admin management
       namespace :admins do
         get "me", to: "dashboard#me"
+        resources :users, only: [:index, :show, :update, :destroy]
       end
     end
   end

@@ -1,6 +1,13 @@
 # frozen_string_literal: true
 
 class User < ApplicationRecord
+  extend OauthCommon
+  include Devise::JWT::RevocationStrategies::JTIMatcher
+
+  devise :jwt_authenticatable, jwt_revocation_strategy: self
+
+  GOOGLE_API_INFO_ENDPOINT = "https://www.googleapis.com/oauth2/v3/userinfo"
+
   has_many :srs_cards, dependent: :destroy
   has_many :review_logs, dependent: :destroy
   has_many :roadmap_day_progresses, dependent: :destroy
@@ -18,8 +25,16 @@ class User < ApplicationRecord
 
   before_validation :generate_jti, on: :create
 
+  def self.ransackable_attributes(_auth_object = nil)
+    %w[email display_name provider is_premium is_banned created_at]
+  end
+
   def premium?
     is_premium && (premium_until.nil? || premium_until > Time.current)
+  end
+
+  def banned?
+    is_banned
   end
 
   private

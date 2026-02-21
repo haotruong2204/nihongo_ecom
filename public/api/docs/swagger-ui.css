@@ -1,6 +1,6 @@
 .swagger-ui {
     /*! normalize.css v7.0.0 | MIT License | github.com/necolas/normalize.css */
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #3b4151
 }
 
@@ -38,7 +38,7 @@
 }
 
 .swagger-ui pre {
-    font-family: monospace,monospace;
+    font-family: Consolas,monaco,monospace;
     font-size: 1em
 }
 
@@ -60,7 +60,7 @@
 }
 
 .swagger-ui code,.swagger-ui kbd,.swagger-ui samp {
-    font-family: monospace,monospace;
+    font-family: Consolas,monaco,monospace;
     font-size: 1em
 }
 
@@ -110,7 +110,7 @@
 }
 
 .swagger-ui button,.swagger-ui input,.swagger-ui optgroup,.swagger-ui select,.swagger-ui textarea {
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     font-size: 100%;
     line-height: 1.15;
     margin: 0
@@ -3033,19 +3033,19 @@
 }
 
 .swagger-ui .sans-serif {
-    font-family: -apple-system,BlinkMacSystemFont,avenir next,avenir,helvetica,helvetica neue,ubuntu,roboto,noto,segoe ui,arial,sans-serif
+    font-family: Consolas,monaco,monospace
 }
 
 .swagger-ui .serif {
-    font-family: georgia,serif
+    font-family: Consolas,monaco,monospace
 }
 
 .swagger-ui .system-sans-serif {
-    font-family: sans-serif
+    font-family: Consolas,monaco,monospace
 }
 
 .swagger-ui .system-serif {
-    font-family: serif
+    font-family: Consolas,monaco,monospace
 }
 
 .swagger-ui .code,.swagger-ui code {
@@ -3053,43 +3053,43 @@
 }
 
 .swagger-ui .courier {
-    font-family: Courier Next,courier,monospace
+    font-family: Consolas,monaco,monospace
 }
 
 .swagger-ui .helvetica {
-    font-family: helvetica neue,helvetica,sans-serif
+    font-family: Consolas,monaco,monospace
 }
 
 .swagger-ui .avenir {
-    font-family: avenir next,avenir,sans-serif
+    font-family: Consolas,monaco,monospace
 }
 
 .swagger-ui .athelas {
-    font-family: athelas,georgia,serif
+    font-family: Consolas,monaco,monospace
 }
 
 .swagger-ui .georgia {
-    font-family: georgia,serif
+    font-family: Consolas,monaco,monospace
 }
 
 .swagger-ui .times {
-    font-family: times,serif
+    font-family: Consolas,monaco,monospace
 }
 
 .swagger-ui .bodoni {
-    font-family: Bodoni MT,serif
+    font-family: Consolas,monaco,monospace
 }
 
 .swagger-ui .calisto {
-    font-family: Calisto MT,serif
+    font-family: Consolas,monaco,monospace
 }
 
 .swagger-ui .garamond {
-    font-family: garamond,serif
+    font-family: Consolas,monaco,monospace
 }
 
 .swagger-ui .baskerville {
-    font-family: baskerville,serif
+    font-family: Consolas,monaco,monospace
 }
 
 .swagger-ui .i {
@@ -9067,7 +9067,7 @@
 .swagger-ui .opblock-tag {
     font-size: 24px;
     margin: 0 0 5px;
-    font-family: "Itim";
+    font-family: Consolas,monaco,monospace;
     color: #3b4151
 }
 
@@ -9084,14 +9084,14 @@
     font-weight: 400;
     flex: 1;
     padding: 0 10px;
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #3b4151
 }
 
 .swagger-ui .parameter__type {
     font-size: 12px;
     padding: 5px 0;
-    font-family: monospace;
+    font-family: Consolas,monaco,monospace;
     font-weight: 600;
     color: #3b4151
 }
@@ -9202,7 +9202,7 @@
     display: flex;
     align-items: center;
     margin: 0 0 0 auto;
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #3b4151
 }
 
@@ -9214,7 +9214,7 @@
     font-size: 14px;
     flex: 1;
     margin: 0;
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #3b4151
 }
 
@@ -9227,7 +9227,7 @@
     border-radius: 3px;
     background: #000;
     text-shadow: 0 1px 0 rgba(0,0,0,.1);
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #fff
 }
 
@@ -9237,7 +9237,7 @@
     align-items: center;
     word-break: break-word;
     padding: 0 10px;
-    font-family: monospace;
+    font-family: Consolas,monaco,monospace;
     font-weight: 600;
     color: #3b4151
 }
@@ -9451,7 +9451,7 @@
     min-width: 60px;
     padding: 0;
     cursor: pointer;
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #3b4151
 }
 
@@ -9479,21 +9479,21 @@
     font-size: 12px;
     margin: 0 0 5px;
     padding: 15px 20px;
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #3b4151
 }
 
 .swagger-ui .opblock-description-wrapper h4,.swagger-ui .opblock-external-docs-wrapper h4,.swagger-ui .opblock-title_normal h4 {
     font-size: 12px;
     margin: 0 0 5px;
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #3b4151
 }
 
 .swagger-ui .opblock-description-wrapper p,.swagger-ui .opblock-external-docs-wrapper p,.swagger-ui .opblock-title_normal p {
     font-size: 14px;
     margin: 0;
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #3b4151
 }
 
@@ -9535,19 +9535,19 @@
 .swagger-ui .responses-inner h4,.swagger-ui .responses-inner h5 {
     font-size: 12px;
     margin: 10px 0 5px;
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #3b4151
 }
 
 .swagger-ui .response-col_status {
     font-size: 14px;
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #3b4151
 }
 
 .swagger-ui .response-col_status .response-undocumented {
     font-size: 11px;
-    font-family: monospace;
+    font-family: Consolas,monaco,monospace;
     font-weight: 600;
     color: #909090
 }
@@ -9556,13 +9556,13 @@
     padding-left: 2em;
     max-width: 40em;
     font-size: 14px;
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #3b4151
 }
 
 .swagger-ui .response-col_links .response-undocumented {
     font-size: 11px;
-    font-family: monospace;
+    font-family: Consolas,monaco,monospace;
     font-weight: 600;
     color: #909090
 }
@@ -9586,7 +9586,7 @@
     border-radius: 4px;
     background: #41444e;
     overflow-wrap: break-word;
-    font-family: monospace;
+    font-family: Consolas,monaco,monospace;
     font-weight: 600;
     color: #fff
 }
@@ -9618,7 +9618,7 @@
     text-align: center;
     padding: 5px;
     border-radius: 4px;
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     font-weight: 600;
     color: #fff;
     font-size: 14px;
@@ -9644,7 +9644,7 @@
     display: flex;
     flex-direction: column;
     margin: -20px 15px 0 0;
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #3b4151
 }
 
@@ -9676,7 +9676,7 @@
     -webkit-transform: translate(-50%,-50%);
     transform: translate(-50%,-50%);
     text-transform: uppercase;
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #3b4151
 }
 
@@ -9750,7 +9750,7 @@
 }
 
 .swagger-ui section h3 {
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #3b4151
 }
 
@@ -9799,7 +9799,7 @@
     border-radius: 4px;
     background: transparent;
     box-shadow: 0 1px 2px rgba(0,0,0,.1);
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #3b4151
 }
 
@@ -9820,7 +9820,7 @@
 .swagger-ui .btn.cancel {
     border-color: #ff6060;
     background-color: transparent;
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #ff6060
 }
 
@@ -9922,7 +9922,7 @@
     background: #f7f7f7 url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMCAyMCI+PHBhdGggZD0iTTEzLjQxOCA3Ljg1OWEuNjk1LjY5NSAwIDAgMSAuOTc4IDAgLjY4LjY4IDAgMCAxIDAgLjk2OWwtMy45MDggMy44M2EuNjk3LjY5NyAwIDAgMS0uOTc5IDBsLTMuOTA4LTMuODNhLjY4LjY4IDAgMCAxIDAtLjk2OS42OTUuNjk1IDAgMCAxIC45NzggMEwxMCAxMWwzLjQxOC0zLjE0MXoiLz48L3N2Zz4=) right 10px center no-repeat;
     background-size: 20px;
     box-shadow: 0 1px 2px 0 rgba(0,0,0,.25);
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #3b4151;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -9956,7 +9956,7 @@
     font-size: 12px;
     font-weight: 700;
     margin: 0 0 5px;
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #3b4151
 }
 
@@ -10050,7 +10050,7 @@
     border-radius: 4px;
     outline: none;
     background: hsla(0,0%,100%,.8);
-    font-family: monospace;
+    font-family: Consolas,monaco,monospace;
     font-weight: 600;
     color: #3b4151
 }
@@ -10067,7 +10067,7 @@
     resize: none;
     border-radius: 4px;
     background: #41444e;
-    font-family: monospace;
+    font-family: Consolas,monaco,monospace;
     font-weight: 600;
     color: #fff
 }
@@ -10086,7 +10086,7 @@
     font-weight: 400!important;
     font-style: italic;
     margin: 0!important;
-    font-family: monospace;
+    font-family: Consolas,monaco,monospace;
     font-weight: 600;
     color: #3b4151
 }
@@ -10163,7 +10163,7 @@
     font-size: 12px;
     margin: 0 0 5px;
     color: #41444e;
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #3b4151
 }
 
@@ -10171,7 +10171,7 @@
     font-size: 18px;
     font-weight: 600;
     margin: 15px 0 0;
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #3b4151
 }
 
@@ -10197,14 +10197,14 @@
     margin: 0;
     padding: 0 20px;
     flex: 1;
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #3b4151
 }
 
 .swagger-ui .model {
     font-size: 12px;
     font-weight: 300;
-    font-family: monospace;
+    font-family: Consolas,monaco,monospace;
     font-weight: 600;
     color: #3b4151
 }
@@ -10304,7 +10304,7 @@
     padding: 10px 20px 10px 10px;
     cursor: pointer;
     transition: all .2s;
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #606060
 }
 
@@ -10323,7 +10323,7 @@
 .swagger-ui section.models h5 {
     font-size: 16px;
     margin: 0 0 10px;
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #707070
 }
 
@@ -10381,7 +10381,7 @@
 
 .swagger-ui .model-title {
     font-size: 16px;
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #505050
 }
 
@@ -10389,7 +10389,7 @@
     font-size: 16px;
     font-weight: 600;
     margin-right: 1em;
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #f93e3e
 }
 
@@ -10417,7 +10417,7 @@
 .swagger-ui .servers>label {
     font-size: 12px;
     margin: -20px 15px 0 0;
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #3b4151
 }
 
@@ -10491,7 +10491,7 @@
     font-size: 12px;
     font-weight: 300;
     vertical-align: middle;
-    font-family: monospace;
+    font-family: Consolas,monaco,monospace;
     font-weight: 600;
     color: #3b4151
 }
@@ -10513,7 +10513,7 @@
     padding: 12px 0;
     text-align: left;
     border-bottom: 1px solid rgba(59,65,81,.2);
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #3b4151
 }
 
@@ -10535,7 +10535,7 @@
     font-size: 16px;
     font-weight: 400;
     margin-right: .75em;
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #3b4151
 }
 
@@ -10555,7 +10555,7 @@
 .swagger-ui .parameter__extension,.swagger-ui .parameter__in {
     font-size: 12px;
     font-style: italic;
-    font-family: monospace;
+    font-family: Consolas,monaco,monospace;
     font-weight: 600;
     color: grey
 }
@@ -10563,7 +10563,7 @@
 .swagger-ui .parameter__deprecated {
     font-size: 12px;
     font-style: italic;
-    font-family: monospace;
+    font-family: Consolas,monaco,monospace;
     font-weight: 600;
     color: red
 }
@@ -10610,7 +10610,7 @@
     flex: 1;
     max-width: 300px;
     text-decoration: none;
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #fff
 }
 
@@ -10664,7 +10664,7 @@
     border: none;
     border-radius: 0 4px 4px 0;
     background: #62a03f;
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #fff
 }
 
@@ -10686,19 +10686,19 @@
 
 .swagger-ui .info li,.swagger-ui .info p,.swagger-ui .info table {
     font-size: 14px;
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #3b4151
 }
 
 .swagger-ui .info h1,.swagger-ui .info h2,.swagger-ui .info h3,.swagger-ui .info h4,.swagger-ui .info h5 {
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #3b4151
 }
 
 .swagger-ui .info a {
     font-size: 14px;
     transition: all .4s;
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #4990e2
 }
 
@@ -10714,7 +10714,7 @@
     font-size: 12px;
     font-weight: 300!important;
     margin: 0;
-    font-family: monospace;
+    font-family: Consolas,monaco,monospace;
     font-weight: 600;
     color: #3b4151
 }
@@ -10722,7 +10722,7 @@
 .swagger-ui .info .title {
     font-size: 36px;
     margin: 0;
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #3b4151
 }
 
@@ -10741,7 +10741,7 @@
 .swagger-ui .info .title small pre {
     margin: 0;
     padding: 0;
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #fff
 }
 
@@ -10795,14 +10795,14 @@
     font-size: 12px;
     padding: 10px;
     border-radius: 4px;
-    font-family: monospace;
+    font-family: Consolas,monaco,monospace;
     font-weight: 600;
     color: #3b4151
 }
 
 .swagger-ui .scopes h2 {
     font-size: 14px;
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #3b4151
 }
 
@@ -10827,7 +10827,7 @@
 .swagger-ui .errors-wrapper .errors h4 {
     font-size: 14px;
     margin: 0;
-    font-family: monospace;
+    font-family: Consolas,monaco,monospace;
     font-weight: 600;
     color: #3b4151
 }
@@ -10845,7 +10845,7 @@
     font-size: 20px;
     margin: 0;
     flex: 1;
-    font-family: sans-serif;
+    font-family: Consolas,monaco,monospace;
     color: #3b4151
 }
 
@@ -10898,7 +10898,7 @@
     padding: 5px 7px;
     border-radius: 4px;
     background: rgba(0,0,0,.05);
-    font-family: monospace;
+    font-family: Consolas,monaco,monospace;
     font-weight: 600;
     color: #9012fe
 }
@@ -10991,7 +10991,7 @@
     padding: 10px;
     border-radius: 4px;
     background: #41444e;
-    font-family: monospace;
+    font-family: Consolas,monaco,monospace;
     font-weight: 600;
     color: #fff;
 }
