@@ -25,8 +25,12 @@ class User < ApplicationRecord
 
   before_validation :generate_jti, on: :create
 
-  def self.ransackable_attributes(_auth_object = nil)
-    %w[email display_name provider is_premium is_banned created_at]
+  def self.ransackable_attributes _auth_object = nil
+    %w[email display_name is_premium is_banned created_at]
+  end
+
+  def self.ransackable_associations _auth_object = nil
+    %w[]
   end
 
   def premium?

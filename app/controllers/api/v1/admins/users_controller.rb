@@ -7,8 +7,7 @@ class Api::V1::Admins::UsersController < Api::V1::BaseController
 
   def index
     q = User.ransack(params[:q])
-    q.sorts = "created_at desc" if q.sorts.empty?
-    pagy, users = pagy(q.result, limit: params[:per_page] || 20)
+    pagy, users = pagy(q.result.order(created_at: :desc), limit: params[:per_page] || 20)
 
     response_success({
                        code: 200,
@@ -34,6 +33,7 @@ class Api::V1::Admins::UsersController < Api::V1::BaseController
       message: I18n.t("api.common.success"),
       resource: UserSerializer.new(@user).serializable_hash,
       stats: stats,
+      learning_summary: build_learning_summary,
       status: :ok
                      })
   end
@@ -66,6 +66,53 @@ class Api::V1::Admins::UsersController < Api::V1::BaseController
 
   def user_params
     params.require(:user).permit(:is_premium, :premium_until, :is_banned, :banned_reason)
+  end
+
+  def build_learning_summary
+    srs = @user.srs_cards
+    reviews = @user.review_logs
+    roadmap = @user.roadmap_day_progresses
+
+    # SRS breakdown by state
+    srs_by_state = srs.group(:state).count
+    srs_total = srs.count
+
+    # Roadmap progress
+    roadmap_completed = roadmap.count
+    last_day = roadmap.order(day: :desc).pick(:day)
+    all_kanji = roadmap.pluck(:kanji_learned).flatten.uniq
+
+    # Review activity
+    reviews_today = reviews.where(reviewed_at: Time.current.all_day).count
+    reviews_7d = reviews.where(reviewed_at: 7.days.ago..).count
+    reviews_30d = reviews.where(reviewed_at: 30.days.ago..).count
+    last_review = reviews.order(reviewed_at: :desc).pick(:reviewed_at)
+
+    # SRS due
+    due_now = srs.where(due_date: ..Time.current).count
+
+    {
+      roadmap: {
+        days_completed: roadmap_completed,
+        last_day: last_day,
+        total_kanji_learned: all_kanji.size
+      },
+      srs: {
+        total: srs_total,
+        new_card: srs_by_state[0] || 0,
+        learning: srs_by_state[1] || 0,
+        review: srs_by_state[2] || 0,
+        relearning: srs_by_state[3] || 0,
+        due_now: due_now
+      },
+      reviews: {
+        total: reviews.count,
+        today: reviews_today,
+        last_7_days: reviews_7d,
+        last_30_days: reviews_30d,
+        last_review_at: last_review
+      }
+    }
   end
 
   def pagy_metadata pagy

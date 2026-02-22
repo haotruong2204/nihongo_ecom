@@ -8,4 +8,8 @@ class RoadmapDayProgress < ApplicationRecord
   validates :completed_at, presence: true
 
   scope :ordered, -> { order(:day) }
+
+  def self.ransackable_attributes _auth_object = nil
+    %w[day completed_at created_at]
+  end
 end

@@ -59,6 +59,188 @@ components:
         per_page:
           type: integer
           example: 20
+    SrsCard:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        kanji:
+          type: string
+          example: "日"
+        state:
+          type: string
+          enum: [new_card, learning, review, relearning]
+          example: new_card
+        ease:
+          type: number
+          format: float
+          example: 2.5
+        interval:
+          type: integer
+          example: 0
+        due_date:
+          type: string
+          format: date-time
+          example: "2026-02-22T00:00:00Z"
+        reviews_count:
+          type: integer
+          example: 0
+        lapses_count:
+          type: integer
+          example: 0
+        last_review_at:
+          type: string
+          format: date-time
+          nullable: true
+          example: null
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    ReviewLog:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        kanji:
+          type: string
+          example: "日"
+        rating:
+          type: string
+          enum: [again, hard, good, easy]
+          example: good
+        interval_before:
+          type: integer
+          nullable: true
+          example: 1
+        interval_after:
+          type: integer
+          nullable: true
+          example: 3
+        reviewed_at:
+          type: string
+          format: date-time
+          example: "2026-02-22T10:00:00Z"
+        created_at:
+          type: string
+          format: date-time
+    RoadmapDayProgress:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        day:
+          type: integer
+          example: 1
+        kanji_learned:
+          type: array
+          items:
+            type: string
+          example: ["日", "月", "火"]
+        completed_at:
+          type: string
+          format: date-time
+          example: "2026-02-22T10:00:00Z"
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    UserSetting:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        learn_mode:
+          type: string
+          enum: [kanji, hanviet, meaning]
+          example: kanji
+        kanji_font:
+          type: string
+          example: "Noto Sans JP"
+        primary_color:
+          type: string
+          example: "#4CAF50"
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    CustomVocabItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        word:
+          type: string
+          example: "食べる"
+        reading:
+          type: string
+          example: "たべる"
+        hanviet:
+          type: string
+          nullable: true
+          example: "Thực"
+        meaning:
+          type: string
+          example: "Ăn"
+        position:
+          type: integer
+          example: 0
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    Feedback:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        user_id:
+          type: integer
+          nullable: true
+          example: 1
+        email:
+          type: string
+          format: email
+          example: user@gmail.com
+        text:
+          type: string
+          example: "App rat hay, cam on!"
+        display:
+          type: boolean
+          example: false
+        status:
+          type: string
+          enum: [pending, reviewed, done, rejected]
+          example: pending
+        admin_reply:
+          type: string
+          nullable: true
+          example: null
+        replied_at:
+          type: string
+          format: date-time
+          nullable: true
+          example: null
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
 paths:
   "/api/v1/admins/sign_in":
     post:
@@ -245,13 +427,6 @@ paths:
           schema:
             type: string
           description: Search by display name (contains)
-        - name: q[provider_eq]
-          in: query
-          required: false
-          schema:
-            type: string
-            example: google
-          description: Filter by provider
         - name: q[is_premium_eq]
           in: query
           required: false
@@ -490,6 +665,2228 @@ paths:
           description: Unauthorized
         "404":
           description: User not found
+
+  "/api/v1/admins/feedbacks":
+    get:
+      tags:
+        - Admin - User Management
+      summary: List all feedbacks
+      description: Get paginated list of all feedbacks with optional Ransack filters
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 1
+          description: Page number
+        - name: per_page
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 20
+          description: Items per page
+        - name: q[status_eq]
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [pending, reviewed, done, rejected]
+          description: Filter by status
+        - name: q[email_cont]
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Search by email (contains)
+        - name: q[display_eq]
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: Filter by display status
+        - name: q[created_at_gteq]
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: Filter created after date
+      responses:
+        "200":
+          description: List of feedbacks
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Success
+                  data:
+                    type: object
+                    properties:
+                      resource:
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                type:
+                                  type: string
+                                  example: feedback
+                                attributes:
+                                  $ref: "#/components/schemas/Feedback"
+                      pagy:
+                        $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+
+  "/api/v1/admins/feedbacks/{id}":
+    get:
+      tags:
+        - Admin - User Management
+      summary: Get feedback detail
+      description: Get a specific feedback by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: Feedback detail
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Success
+                  data:
+                    type: object
+                    properties:
+                      resource:
+                        type: object
+                        properties:
+                          data:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              type:
+                                type: string
+                                example: feedback
+                              attributes:
+                                $ref: "#/components/schemas/Feedback"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+    patch:
+      tags:
+        - Admin - User Management
+      summary: Update feedback
+      description: Update feedback status, admin reply, and display flag
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                feedback:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                      enum: [pending, reviewed, done, rejected]
+                      example: reviewed
+                    admin_reply:
+                      type: string
+                      example: "Cam on ban da gop y!"
+                    display:
+                      type: boolean
+                      example: true
+        required: true
+      responses:
+        "200":
+          description: Feedback updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Update resource successfully
+                  data:
+                    type: object
+                    properties:
+                      resource:
+                        type: object
+                        properties:
+                          data:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              type:
+                                type: string
+                                example: feedback
+                              attributes:
+                                $ref: "#/components/schemas/Feedback"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+        "422":
+          description: Unprocessable Entity
+    delete:
+      tags:
+        - Admin - User Management
+      summary: Delete feedback
+      description: Delete a feedback permanently
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: Feedback deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Delete resource successfully
+                  data:
+                    type: object
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+
+  "/api/v1/admins/users/{user_id}/srs_cards":
+    get:
+      tags:
+        - Admin - User Data
+      summary: List user's SRS cards
+      description: Get paginated list of a specific user's SRS cards
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+          description: User ID
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 1
+        - name: per_page
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 20
+        - name: q[kanji_eq]
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by kanji
+        - name: q[state_eq]
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [new_card, learning, review, relearning]
+          description: Filter by state
+        - name: q[due_date_lteq]
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: Filter cards due before date
+      responses:
+        "200":
+          description: List of SRS cards
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Success
+                  data:
+                    type: object
+                    properties:
+                      resource:
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                type:
+                                  type: string
+                                  example: srs_card
+                                attributes:
+                                  $ref: "#/components/schemas/SrsCard"
+                      pagy:
+                        $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+        "404":
+          description: User not found
+
+  "/api/v1/admins/users/{user_id}/review_logs":
+    get:
+      tags:
+        - Admin - User Data
+      summary: List user's review logs
+      description: Get paginated list of a specific user's review logs
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 1
+        - name: per_page
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 20
+        - name: q[kanji_eq]
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by kanji
+        - name: q[rating_eq]
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [again, hard, good, easy]
+          description: Filter by rating
+        - name: q[reviewed_at_gteq]
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: Filter reviewed after date
+      responses:
+        "200":
+          description: List of review logs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Success
+                  data:
+                    type: object
+                    properties:
+                      resource:
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                type:
+                                  type: string
+                                  example: review_log
+                                attributes:
+                                  $ref: "#/components/schemas/ReviewLog"
+                      pagy:
+                        $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+        "404":
+          description: User not found
+
+  "/api/v1/admins/users/{user_id}/roadmap_day_progresses":
+    get:
+      tags:
+        - Admin - User Data
+      summary: List user's roadmap day progresses
+      description: Get paginated list of a specific user's roadmap progress
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 1
+        - name: per_page
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 20
+        - name: q[day_eq]
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Filter by day number
+      responses:
+        "200":
+          description: List of roadmap day progresses
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Success
+                  data:
+                    type: object
+                    properties:
+                      resource:
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                type:
+                                  type: string
+                                  example: roadmap_day_progress
+                                attributes:
+                                  $ref: "#/components/schemas/RoadmapDayProgress"
+                      pagy:
+                        $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+        "404":
+          description: User not found
+
+  "/api/v1/admins/users/{user_id}/custom_vocab_items":
+    get:
+      tags:
+        - Admin - User Data
+      summary: List user's custom vocab items
+      description: Get paginated list of a specific user's custom vocabulary
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 1
+        - name: per_page
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 20
+        - name: q[word_cont]
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Search by word
+      responses:
+        "200":
+          description: List of custom vocab items
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Success
+                  data:
+                    type: object
+                    properties:
+                      resource:
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                type:
+                                  type: string
+                                  example: custom_vocab_item
+                                attributes:
+                                  $ref: "#/components/schemas/CustomVocabItem"
+                      pagy:
+                        $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+        "404":
+          description: User not found
+
+  "/api/v1/admins/users/{user_id}/feedbacks":
+    get:
+      tags:
+        - Admin - User Data
+      summary: List user's feedbacks
+      description: Get paginated list of a specific user's feedbacks
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 1
+        - name: per_page
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 20
+        - name: q[status_eq]
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [pending, reviewed, done, rejected]
+          description: Filter by status
+      responses:
+        "200":
+          description: List of feedbacks
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Success
+                  data:
+                    type: object
+                    properties:
+                      resource:
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                type:
+                                  type: string
+                                  example: feedback
+                                attributes:
+                                  $ref: "#/components/schemas/Feedback"
+                      pagy:
+                        $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+        "404":
+          description: User not found
+
+  "/api/v1/admins/users/{user_id}/setting":
+    get:
+      tags:
+        - Admin - User Data
+      summary: Get user's settings
+      description: Get a specific user's settings
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: User settings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Success
+                  data:
+                    type: object
+                    properties:
+                      resource:
+                        type: object
+                        nullable: true
+                        properties:
+                          data:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              type:
+                                type: string
+                                example: user_setting
+                              attributes:
+                                $ref: "#/components/schemas/UserSetting"
+        "401":
+          description: Unauthorized
+        "404":
+          description: User not found
+
+  # ──────────────────────────────────────────────
+  # User-Facing API
+  # ──────────────────────────────────────────────
+
+  "/api/v1/users/me":
+    get:
+      tags:
+        - User - Profile
+      summary: Get current user profile
+      description: Returns the authenticated user's profile information
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Success
+                  data:
+                    type: object
+                    properties:
+                      resource:
+                        type: object
+                        properties:
+                          data:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                example: "1"
+                              type:
+                                type: string
+                                example: user
+                              attributes:
+                                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+
+  "/api/v1/users/setting":
+    get:
+      tags:
+        - User - Settings
+      summary: Get user settings
+      description: Returns the authenticated user's settings. Creates default settings if none exist.
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: User settings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Success
+                  data:
+                    type: object
+                    properties:
+                      resource:
+                        type: object
+                        properties:
+                          data:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                example: "1"
+                              type:
+                                type: string
+                                example: user_setting
+                              attributes:
+                                $ref: "#/components/schemas/UserSetting"
+        "401":
+          description: Unauthorized
+    patch:
+      tags:
+        - User - Settings
+      summary: Update user settings
+      description: Update the authenticated user's settings. Creates settings if none exist.
+      security:
+        - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                setting:
+                  type: object
+                  properties:
+                    learn_mode:
+                      type: string
+                      enum: [kanji, hanviet, meaning]
+                      example: kanji
+                    kanji_font:
+                      type: string
+                      example: "Noto Sans JP"
+                    primary_color:
+                      type: string
+                      example: "#4CAF50"
+        required: true
+      responses:
+        "200":
+          description: Settings updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Update resource successfully
+                  data:
+                    type: object
+                    properties:
+                      resource:
+                        type: object
+                        properties:
+                          data:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              type:
+                                type: string
+                                example: user_setting
+                              attributes:
+                                $ref: "#/components/schemas/UserSetting"
+        "401":
+          description: Unauthorized
+        "422":
+          description: Unprocessable Entity
+
+  "/api/v1/users/srs_cards":
+    get:
+      tags:
+        - User - SRS Cards
+      summary: List SRS cards
+      description: Get paginated list of the authenticated user's SRS cards with optional Ransack filters
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 1
+          description: Page number
+        - name: per_page
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 20
+          description: Items per page
+        - name: q[kanji_eq]
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by kanji (exact match)
+        - name: q[state_eq]
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [new_card, learning, review, relearning]
+          description: Filter by state
+        - name: q[due_date_lteq]
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: Filter cards due before date
+      responses:
+        "200":
+          description: List of SRS cards
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Success
+                  data:
+                    type: object
+                    properties:
+                      resource:
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                type:
+                                  type: string
+                                  example: srs_card
+                                attributes:
+                                  $ref: "#/components/schemas/SrsCard"
+                      pagy:
+                        $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+    post:
+      tags:
+        - User - SRS Cards
+      summary: Create SRS card
+      description: Create a new SRS card for the authenticated user
+      security:
+        - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                srs_card:
+                  type: object
+                  required:
+                    - kanji
+                    - ease
+                    - interval
+                    - due_date
+                  properties:
+                    kanji:
+                      type: string
+                      example: "日"
+                    state:
+                      type: string
+                      enum: [new_card, learning, review, relearning]
+                      example: new_card
+                    ease:
+                      type: number
+                      format: float
+                      example: 2.5
+                    interval:
+                      type: integer
+                      example: 0
+                    due_date:
+                      type: string
+                      format: date-time
+                      example: "2026-02-22T00:00:00Z"
+                    reviews_count:
+                      type: integer
+                      example: 0
+                    lapses_count:
+                      type: integer
+                      example: 0
+                    last_review_at:
+                      type: string
+                      format: date-time
+                      nullable: true
+        required: true
+      responses:
+        "200":
+          description: SRS card created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Create resource successfully
+                  data:
+                    type: object
+                    properties:
+                      resource:
+                        type: object
+                        properties:
+                          data:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              type:
+                                type: string
+                                example: srs_card
+                              attributes:
+                                $ref: "#/components/schemas/SrsCard"
+        "401":
+          description: Unauthorized
+        "422":
+          description: Unprocessable Entity
+
+  "/api/v1/users/srs_cards/{id}":
+    get:
+      tags:
+        - User - SRS Cards
+      summary: Get SRS card
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: SRS card detail
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Success
+                  data:
+                    type: object
+                    properties:
+                      resource:
+                        type: object
+                        properties:
+                          data:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              type:
+                                type: string
+                                example: srs_card
+                              attributes:
+                                $ref: "#/components/schemas/SrsCard"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+    patch:
+      tags:
+        - User - SRS Cards
+      summary: Update SRS card
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                srs_card:
+                  type: object
+                  properties:
+                    kanji:
+                      type: string
+                    state:
+                      type: string
+                      enum: [new_card, learning, review, relearning]
+                    ease:
+                      type: number
+                      format: float
+                    interval:
+                      type: integer
+                    due_date:
+                      type: string
+                      format: date-time
+                    reviews_count:
+                      type: integer
+                    lapses_count:
+                      type: integer
+                    last_review_at:
+                      type: string
+                      format: date-time
+                      nullable: true
+        required: true
+      responses:
+        "200":
+          description: SRS card updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Update resource successfully
+                  data:
+                    type: object
+                    properties:
+                      resource:
+                        type: object
+                        properties:
+                          data:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              type:
+                                type: string
+                                example: srs_card
+                              attributes:
+                                $ref: "#/components/schemas/SrsCard"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+        "422":
+          description: Unprocessable Entity
+    delete:
+      tags:
+        - User - SRS Cards
+      summary: Delete SRS card
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: SRS card deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Delete resource successfully
+                  data:
+                    type: object
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+
+  "/api/v1/users/review_logs":
+    get:
+      tags:
+        - User - Review Logs
+      summary: List review logs
+      description: Get paginated list of the authenticated user's review logs (append-only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 1
+          description: Page number
+        - name: per_page
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 20
+          description: Items per page
+        - name: q[kanji_eq]
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by kanji
+        - name: q[rating_eq]
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [again, hard, good, easy]
+          description: Filter by rating
+        - name: q[reviewed_at_gteq]
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: Filter reviewed after date
+      responses:
+        "200":
+          description: List of review logs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Success
+                  data:
+                    type: object
+                    properties:
+                      resource:
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                type:
+                                  type: string
+                                  example: review_log
+                                attributes:
+                                  $ref: "#/components/schemas/ReviewLog"
+                      pagy:
+                        $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+    post:
+      tags:
+        - User - Review Logs
+      summary: Create review log
+      description: Append a new review log entry (cannot be updated or deleted)
+      security:
+        - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                review_log:
+                  type: object
+                  required:
+                    - kanji
+                    - rating
+                    - reviewed_at
+                  properties:
+                    kanji:
+                      type: string
+                      example: "日"
+                    rating:
+                      type: string
+                      enum: [again, hard, good, easy]
+                      example: good
+                    interval_before:
+                      type: integer
+                      nullable: true
+                      example: 1
+                    interval_after:
+                      type: integer
+                      nullable: true
+                      example: 3
+                    reviewed_at:
+                      type: string
+                      format: date-time
+                      example: "2026-02-22T10:00:00Z"
+        required: true
+      responses:
+        "200":
+          description: Review log created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Create resource successfully
+                  data:
+                    type: object
+                    properties:
+                      resource:
+                        type: object
+                        properties:
+                          data:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              type:
+                                type: string
+                                example: review_log
+                              attributes:
+                                $ref: "#/components/schemas/ReviewLog"
+        "401":
+          description: Unauthorized
+        "422":
+          description: Unprocessable Entity
+
+  "/api/v1/users/review_logs/{id}":
+    get:
+      tags:
+        - User - Review Logs
+      summary: Get review log
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: Review log detail
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Success
+                  data:
+                    type: object
+                    properties:
+                      resource:
+                        type: object
+                        properties:
+                          data:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              type:
+                                type: string
+                                example: review_log
+                              attributes:
+                                $ref: "#/components/schemas/ReviewLog"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+
+  "/api/v1/users/roadmap_day_progresses":
+    get:
+      tags:
+        - User - Roadmap Progress
+      summary: List roadmap day progresses
+      description: Get paginated list of the authenticated user's roadmap day progresses
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 1
+          description: Page number
+        - name: per_page
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 20
+          description: Items per page
+        - name: q[day_eq]
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Filter by day number
+        - name: q[completed_at_gteq]
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: Filter completed after date
+      responses:
+        "200":
+          description: List of roadmap day progresses
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Success
+                  data:
+                    type: object
+                    properties:
+                      resource:
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                type:
+                                  type: string
+                                  example: roadmap_day_progress
+                                attributes:
+                                  $ref: "#/components/schemas/RoadmapDayProgress"
+                      pagy:
+                        $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+    post:
+      tags:
+        - User - Roadmap Progress
+      summary: Create roadmap day progress
+      security:
+        - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                roadmap_day_progress:
+                  type: object
+                  required:
+                    - day
+                    - kanji_learned
+                    - completed_at
+                  properties:
+                    day:
+                      type: integer
+                      example: 1
+                    kanji_learned:
+                      type: array
+                      items:
+                        type: string
+                      example: ["日", "月", "火"]
+                    completed_at:
+                      type: string
+                      format: date-time
+                      example: "2026-02-22T10:00:00Z"
+        required: true
+      responses:
+        "200":
+          description: Roadmap day progress created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Create resource successfully
+                  data:
+                    type: object
+                    properties:
+                      resource:
+                        type: object
+                        properties:
+                          data:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              type:
+                                type: string
+                                example: roadmap_day_progress
+                              attributes:
+                                $ref: "#/components/schemas/RoadmapDayProgress"
+        "401":
+          description: Unauthorized
+        "422":
+          description: Unprocessable Entity
+
+  "/api/v1/users/roadmap_day_progresses/{id}":
+    get:
+      tags:
+        - User - Roadmap Progress
+      summary: Get roadmap day progress
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: Roadmap day progress detail
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Success
+                  data:
+                    type: object
+                    properties:
+                      resource:
+                        type: object
+                        properties:
+                          data:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              type:
+                                type: string
+                                example: roadmap_day_progress
+                              attributes:
+                                $ref: "#/components/schemas/RoadmapDayProgress"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+    patch:
+      tags:
+        - User - Roadmap Progress
+      summary: Update roadmap day progress
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                roadmap_day_progress:
+                  type: object
+                  properties:
+                    day:
+                      type: integer
+                    kanji_learned:
+                      type: array
+                      items:
+                        type: string
+                    completed_at:
+                      type: string
+                      format: date-time
+        required: true
+      responses:
+        "200":
+          description: Roadmap day progress updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Update resource successfully
+                  data:
+                    type: object
+                    properties:
+                      resource:
+                        type: object
+                        properties:
+                          data:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              type:
+                                type: string
+                                example: roadmap_day_progress
+                              attributes:
+                                $ref: "#/components/schemas/RoadmapDayProgress"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+        "422":
+          description: Unprocessable Entity
+    delete:
+      tags:
+        - User - Roadmap Progress
+      summary: Delete roadmap day progress
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: Roadmap day progress deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Delete resource successfully
+                  data:
+                    type: object
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+
+  "/api/v1/users/custom_vocab_items":
+    get:
+      tags:
+        - User - Custom Vocab
+      summary: List custom vocab items
+      description: Get paginated list of the authenticated user's custom vocabulary items
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 1
+          description: Page number
+        - name: per_page
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 20
+          description: Items per page
+        - name: q[word_cont]
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Search by word (contains)
+        - name: q[reading_cont]
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Search by reading (contains)
+      responses:
+        "200":
+          description: List of custom vocab items
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Success
+                  data:
+                    type: object
+                    properties:
+                      resource:
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                type:
+                                  type: string
+                                  example: custom_vocab_item
+                                attributes:
+                                  $ref: "#/components/schemas/CustomVocabItem"
+                      pagy:
+                        $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+    post:
+      tags:
+        - User - Custom Vocab
+      summary: Create custom vocab item
+      security:
+        - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                custom_vocab_item:
+                  type: object
+                  required:
+                    - word
+                    - reading
+                    - meaning
+                    - position
+                  properties:
+                    word:
+                      type: string
+                      example: "食べる"
+                    reading:
+                      type: string
+                      example: "たべる"
+                    hanviet:
+                      type: string
+                      nullable: true
+                      example: "Thực"
+                    meaning:
+                      type: string
+                      example: "Ăn"
+                    position:
+                      type: integer
+                      example: 0
+        required: true
+      responses:
+        "200":
+          description: Custom vocab item created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Create resource successfully
+                  data:
+                    type: object
+                    properties:
+                      resource:
+                        type: object
+                        properties:
+                          data:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              type:
+                                type: string
+                                example: custom_vocab_item
+                              attributes:
+                                $ref: "#/components/schemas/CustomVocabItem"
+        "401":
+          description: Unauthorized
+        "422":
+          description: Unprocessable Entity
+
+  "/api/v1/users/custom_vocab_items/{id}":
+    get:
+      tags:
+        - User - Custom Vocab
+      summary: Get custom vocab item
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: Custom vocab item detail
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Success
+                  data:
+                    type: object
+                    properties:
+                      resource:
+                        type: object
+                        properties:
+                          data:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              type:
+                                type: string
+                                example: custom_vocab_item
+                              attributes:
+                                $ref: "#/components/schemas/CustomVocabItem"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+    patch:
+      tags:
+        - User - Custom Vocab
+      summary: Update custom vocab item
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                custom_vocab_item:
+                  type: object
+                  properties:
+                    word:
+                      type: string
+                    reading:
+                      type: string
+                    hanviet:
+                      type: string
+                      nullable: true
+                    meaning:
+                      type: string
+                    position:
+                      type: integer
+        required: true
+      responses:
+        "200":
+          description: Custom vocab item updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Update resource successfully
+                  data:
+                    type: object
+                    properties:
+                      resource:
+                        type: object
+                        properties:
+                          data:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              type:
+                                type: string
+                                example: custom_vocab_item
+                              attributes:
+                                $ref: "#/components/schemas/CustomVocabItem"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+        "422":
+          description: Unprocessable Entity
+    delete:
+      tags:
+        - User - Custom Vocab
+      summary: Delete custom vocab item
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: Custom vocab item deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Delete resource successfully
+                  data:
+                    type: object
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+
+  "/api/v1/users/feedbacks":
+    get:
+      tags:
+        - User - Feedbacks
+      summary: List feedbacks
+      description: Get paginated list of the authenticated user's feedbacks
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 1
+          description: Page number
+        - name: per_page
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 20
+          description: Items per page
+        - name: q[status_eq]
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [pending, reviewed, done, rejected]
+          description: Filter by status
+      responses:
+        "200":
+          description: List of feedbacks
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Success
+                  data:
+                    type: object
+                    properties:
+                      resource:
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                type:
+                                  type: string
+                                  example: feedback
+                                attributes:
+                                  $ref: "#/components/schemas/Feedback"
+                      pagy:
+                        $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+    post:
+      tags:
+        - User - Feedbacks
+      summary: Create feedback
+      description: Submit a new feedback. Email is auto-filled from the authenticated user. Cannot update or delete after creation.
+      security:
+        - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                feedback:
+                  type: object
+                  required:
+                    - text
+                  properties:
+                    text:
+                      type: string
+                      example: "App rat hay, cam on!"
+                    email:
+                      type: string
+                      format: email
+                      description: Optional, auto-filled from user profile if not provided
+                      example: user@gmail.com
+        required: true
+      responses:
+        "200":
+          description: Feedback created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Create resource successfully
+                  data:
+                    type: object
+                    properties:
+                      resource:
+                        type: object
+                        properties:
+                          data:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              type:
+                                type: string
+                                example: feedback
+                              attributes:
+                                $ref: "#/components/schemas/Feedback"
+        "401":
+          description: Unauthorized
+        "422":
+          description: Unprocessable Entity
+
+  "/api/v1/users/feedbacks/{id}":
+    get:
+      tags:
+        - User - Feedbacks
+      summary: Get feedback
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: Feedback detail
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Success
+                  data:
+                    type: object
+                    properties:
+                      resource:
+                        type: object
+                        properties:
+                          data:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              type:
+                                type: string
+                                example: feedback
+                              attributes:
+                                $ref: "#/components/schemas/Feedback"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
 
 security:
   - BearerAuth: []

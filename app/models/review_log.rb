@@ -11,4 +11,8 @@ class ReviewLog < ApplicationRecord
 
   scope :on_date, ->(date) { where(reviewed_at: date.all_day) }
   scope :for_kanji, ->(kanji) { where(kanji: kanji) }
+
+  def self.ransackable_attributes _auth_object = nil
+    %w[kanji rating reviewed_at created_at]
+  end
 end

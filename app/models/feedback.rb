@@ -9,4 +9,8 @@ class Feedback < ApplicationRecord
 
   scope :displayed, -> { where(display: true) }
   scope :recent, -> { order(created_at: :desc) }
+
+  def self.ransackable_attributes _auth_object = nil
+    %w[status email display created_at]
+  end
 end

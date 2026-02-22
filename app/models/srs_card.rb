@@ -15,4 +15,8 @@ class SrsCard < ApplicationRecord
   scope :by_state, ->(state) { where(state: state) }
   scope :young, -> { review.where(interval: ...21) }
   scope :mature, -> { review.where(interval: 21..) }
+
+  def self.ransackable_attributes _auth_object = nil
+    %w[kanji state due_date created_at]
+  end
 end

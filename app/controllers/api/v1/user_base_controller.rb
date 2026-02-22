@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Api::V1::UserBaseController < ApplicationController
+  include Pagy::Backend
   before_action :authenticate_user!
   include CommonResponse
   include ErrorCode
@@ -23,4 +24,15 @@ class Api::V1::UserBaseController < ApplicationController
   end
 
   attr_reader :current_user
+
+  private
+
+  def pagy_metadata pagy
+    {
+      current_page: pagy.page,
+      total_pages: pagy.pages,
+      total_count: pagy.count,
+      per_page: pagy.limit
+    }
+  end
 end
