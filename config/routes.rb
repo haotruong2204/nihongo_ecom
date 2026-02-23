@@ -11,6 +11,9 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
+      # Public endpoints (no auth)
+      resources :public_feedbacks, only: [:index]
+
       # User OAuth & API
       namespace :users do
         post "auth_google", to: "omniauths#auth_google"
