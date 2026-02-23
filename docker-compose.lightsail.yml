@@ -15,7 +15,6 @@ services:
     volumes:
       - app_storage:/app/storage
       - app_log:/app/log
-      - ./config/rsa_public.pem:/app/config/rsa_public.pem:ro
     depends_on:
       db:
         condition: service_healthy
