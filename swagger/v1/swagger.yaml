@@ -750,6 +750,35 @@ paths:
                                   example: feedback
                                 attributes:
                                   $ref: "#/components/schemas/Feedback"
+                                relationships:
+                                  type: object
+                                  properties:
+                                    user:
+                                      type: object
+                                      properties:
+                                        data:
+                                          type: object
+                                          nullable: true
+                                          properties:
+                                            id:
+                                              type: string
+                                              example: "5"
+                                            type:
+                                              type: string
+                                              example: user
+                          included:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                  example: "5"
+                                type:
+                                  type: string
+                                  example: user
+                                attributes:
+                                  $ref: "#/components/schemas/User"
                       pagy:
                         $ref: "#/components/schemas/Pagination"
         "401":
@@ -772,7 +801,7 @@ paths:
             example: 1
       responses:
         "200":
-          description: Feedback detail
+          description: Feedback detail with user info
           content:
             application/json:
               schema:
@@ -803,6 +832,35 @@ paths:
                                 example: feedback
                               attributes:
                                 $ref: "#/components/schemas/Feedback"
+                              relationships:
+                                type: object
+                                properties:
+                                  user:
+                                    type: object
+                                    properties:
+                                      data:
+                                        type: object
+                                        nullable: true
+                                        properties:
+                                          id:
+                                            type: string
+                                            example: "5"
+                                          type:
+                                            type: string
+                                            example: user
+                          included:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                  example: "5"
+                                type:
+                                  type: string
+                                  example: user
+                                attributes:
+                                  $ref: "#/components/schemas/User"
         "401":
           description: Unauthorized
         "404":
@@ -843,7 +901,7 @@ paths:
         required: true
       responses:
         "200":
-          description: Feedback updated
+          description: Feedback updated with user info
           content:
             application/json:
               schema:
@@ -874,6 +932,35 @@ paths:
                                 example: feedback
                               attributes:
                                 $ref: "#/components/schemas/Feedback"
+                              relationships:
+                                type: object
+                                properties:
+                                  user:
+                                    type: object
+                                    properties:
+                                      data:
+                                        type: object
+                                        nullable: true
+                                        properties:
+                                          id:
+                                            type: string
+                                            example: "5"
+                                          type:
+                                            type: string
+                                            example: user
+                          included:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                  example: "5"
+                                type:
+                                  type: string
+                                  example: user
+                                attributes:
+                                  $ref: "#/components/schemas/User"
         "401":
           description: Unauthorized
         "404":
