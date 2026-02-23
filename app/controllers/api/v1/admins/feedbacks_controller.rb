@@ -28,8 +28,11 @@ class Api::V1::Admins::FeedbacksController < Api::V1::BaseController
   end
 
   def update
+    admin_reply_changed = feedback_params[:admin_reply].present? && feedback_params[:admin_reply] != @feedback.admin_reply
+
     if @feedback.update(feedback_params)
       @feedback.update_column(:replied_at, Time.current) if @feedback.admin_reply.present? && @feedback.replied_at.nil?
+      FeedbackMailer.reply_notification(@feedback).deliver_later if admin_reply_changed && @feedback.email.present?
 
       response_success({
                          code: 200,
