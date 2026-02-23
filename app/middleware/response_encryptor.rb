@@ -8,16 +8,24 @@ class ResponseEncryptor
   def call(env)
     status, headers, response = @app.call(env)
 
+    # Skip encryption for preflight OPTIONS requests
+    return [ status, headers, response ] if env["REQUEST_METHOD"] == "OPTIONS"
+
     if should_encrypt?(env, headers)
-      body = extract_body(response)
-      encrypted = EncryptionService.encrypt(body)
-      encrypted_json = encrypted.to_json
+      begin
+        body = extract_body(response)
+        encrypted = EncryptionService.encrypt(body)
+        encrypted_json = encrypted.to_json
 
-      headers["Content-Type"] = "application/json; charset=utf-8"
-      headers["Content-Length"] = encrypted_json.bytesize.to_s
-      headers["X-Encrypted"] = "true"
+        headers["Content-Type"] = "application/json; charset=utf-8"
+        headers["Content-Length"] = encrypted_json.bytesize.to_s
+        headers["X-Encrypted"] = "true"
 
-      response = [ encrypted_json ]
+        response = [ encrypted_json ]
+      rescue => e
+        Rails.logger.error("[ResponseEncryptor] Encryption failed: #{e.message}")
+        # Return original response if encryption fails
+      end
     end
 
     [ status, headers, response ]
@@ -51,7 +59,7 @@ class ResponseEncryptor
   end
 
   def rsa_key_configured?
-    ENV["RSA_PUBLIC_KEY"].present?
+    ENV["RSA_PUBLIC_KEY_PATH"].present? || ENV["RSA_PUBLIC_KEY"].present?
   end
 
   def extract_body(response)
