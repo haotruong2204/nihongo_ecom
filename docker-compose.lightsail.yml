@@ -10,9 +10,12 @@ services:
     container_name: nihongo_api
     command: bundle exec puma -C config/puma.rb
     env_file: .env.production
+    environment:
+      - RSA_PUBLIC_KEY_PATH=/app/config/rsa_public.pem
     volumes:
       - app_storage:/app/storage
       - app_log:/app/log
+      - ./config/rsa_public.pem:/app/config/rsa_public.pem:ro
     depends_on:
       db:
         condition: service_healthy

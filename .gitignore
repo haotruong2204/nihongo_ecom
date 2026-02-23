@@ -39,3 +39,7 @@ coverage
 
 # Python virtual environment
 .venv/
+
+# RSA key files (private keys only — public key is safe to commit)
+*.pem
+!/config/rsa_public.pem

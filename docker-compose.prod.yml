@@ -18,9 +18,11 @@ services:
       - REDIS_URL=${REDIS_URL}
       - RAILS_MASTER_KEY=${RAILS_MASTER_KEY}
       - SECRET_KEY_BASE=${SECRET_KEY_BASE}
+      - RSA_PUBLIC_KEY_PATH=/app/config/rsa_public.pem
     volumes:
       - app_storage:/app/storage
       - app_logs:/app/log
+      - ./config/rsa_public.pem:/app/config/rsa_public.pem:ro
     depends_on:
       db:
         condition: service_healthy

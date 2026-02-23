@@ -31,5 +31,9 @@ module NihongoEcom
 
     # Enable Rack::Attack for rate limiting
     config.middleware.use Rack::Attack
+
+    # Encrypt API JSON responses (RSA + AES hybrid)
+    require_relative "../app/middleware/response_encryptor"
+    config.middleware.use ResponseEncryptor
   end
 end

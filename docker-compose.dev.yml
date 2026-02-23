@@ -15,6 +15,7 @@ services:
       - RACK_ENV=development
       - DATABASE_URL=mysql2://root:password@db:3306/nihongo_ecom_development
       - REDIS_URL=redis://redis:6379
+      - RSA_PUBLIC_KEY_PATH=/app/config/rsa_public.pem
     volumes:
       - .:/app
       - bundle_cache:/usr/local/bundle
