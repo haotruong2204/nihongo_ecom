@@ -17,6 +17,7 @@ class User < ApplicationRecord
   has_many :contacts, dependent: :nullify
   has_many :tango_lesson_progresses, dependent: :destroy
   has_many :jlpt_test_results, dependent: :destroy
+  has_many :chat_rooms, dependent: :nullify
 
   validates :uid, presence: true, uniqueness: true, length: { maximum: 128 }
   validates :email, presence: true, uniqueness: true, length: { maximum: 255 }

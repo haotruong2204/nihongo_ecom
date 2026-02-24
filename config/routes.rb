@@ -24,12 +24,15 @@ Rails.application.routes.draw do
         resources :roadmap_day_progresses, only: [:index, :show, :create, :update, :destroy]
         resources :custom_vocab_items, only: [:index, :show, :create, :update, :destroy]
         resources :feedbacks, only: [:index, :show, :create]
+        get "chat_status", to: "chat_status#show"
+        post "chat_messages", to: "chat_status#record_message"
       end
 
       # Admin management
       namespace :admins do
         get "me", to: "dashboard#me"
         resources :feedbacks, only: [:index, :show, :update, :destroy]
+        resources :chat_rooms, only: [:index, :update], param: :uid
         resources :users, only: [:index, :show, :update, :destroy] do
           resources :srs_cards, only: [:index], controller: "user_srs_cards"
           resources :review_logs, only: [:index], controller: "user_review_logs"

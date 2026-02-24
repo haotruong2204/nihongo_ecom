@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_02_21_164001) do
+ActiveRecord::Schema[8.0].define(version: 2026_02_24_030000) do
   create_table "admins", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -23,6 +23,23 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_21_164001) do
     t.index ["email"], name: "index_admins_on_email", unique: true
     t.index ["jti"], name: "index_admins_on_jti", unique: true
     t.index ["reset_password_token"], name: "index_admins_on_reset_password_token", unique: true
+  end
+
+  create_table "chat_rooms", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.string "uid", null: false
+    t.bigint "user_id"
+    t.string "status", default: "open"
+    t.datetime "last_admin_reply_at"
+    t.datetime "last_user_message_at"
+    t.datetime "last_opened_at"
+    t.text "admin_note"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "chat_banned", default: false, null: false
+    t.string "chat_ban_reason", limit: 500
+    t.index ["status"], name: "index_chat_rooms_on_status"
+    t.index ["uid"], name: "index_chat_rooms_on_uid", unique: true
+    t.index ["user_id"], name: "index_chat_rooms_on_user_id"
   end
 
   create_table "contacts", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
@@ -171,6 +188,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_21_164001) do
     t.index ["uid"], name: "index_users_on_uid", unique: true
   end
 
+  add_foreign_key "chat_rooms", "users"
   add_foreign_key "contacts", "users"
   add_foreign_key "custom_vocab_items", "users"
   add_foreign_key "feedbacks", "users"
