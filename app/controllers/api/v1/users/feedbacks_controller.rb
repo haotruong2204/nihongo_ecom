@@ -28,9 +28,11 @@ class Api::V1::Users::FeedbacksController < Api::V1::UserBaseController
   def create
     feedback = current_user.feedbacks.build(feedback_params)
     feedback.email = current_user.email
+    feedback.display_name = current_user.display_name
     feedback.photo_url = current_user.photo_url
 
     if feedback.save
+      AdminNotification.create_for_feedback(feedback)
       response_success({
                          code: 200,
         message: I18n.t("api.common.create_success"),

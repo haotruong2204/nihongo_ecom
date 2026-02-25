@@ -24,6 +24,14 @@ Rails.application.routes.draw do
         resources :roadmap_day_progresses, only: [:index, :show, :create, :update, :destroy]
         resources :custom_vocab_items, only: [:index, :show, :create, :update, :destroy]
         resources :feedbacks, only: [:index, :show, :create]
+        resources :notifications, only: [:index], controller: "notifications" do
+          collection do
+            patch :mark_read
+          end
+          member do
+            patch :mark_read
+          end
+        end
         get "chat_status", to: "chat_status#show"
         post "chat_messages", to: "chat_status#record_message"
       end
@@ -33,6 +41,14 @@ Rails.application.routes.draw do
         get "me", to: "dashboard#me"
         resources :feedbacks, only: [:index, :show, :update, :destroy] do
           resources :replies, only: [:create], controller: "feedback_replies"
+        end
+        resources :admin_notifications, only: [:index] do
+          collection do
+            patch :mark_read
+          end
+          member do
+            patch :mark_read
+          end
         end
         resources :chat_rooms, only: [:index, :update], param: :uid
         resources :users, only: [:index, :show, :update, :destroy] do

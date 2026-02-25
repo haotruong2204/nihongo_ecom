@@ -3,7 +3,7 @@
 class PublicFeedbackSerializer
   include JSONAPI::Serializer
 
-  attributes :id, :user_id, :email, :photo_url, :text, :status, :admin_reply, :replied_at,
+  attributes :id, :user_id, :email, :display_name, :photo_url, :text, :status, :admin_reply, :replied_at,
              :parent_id, :context_type, :context_id, :context_label,
              :created_at, :updated_at
 

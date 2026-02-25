@@ -15,6 +15,7 @@ class Api::V1::Admins::FeedbackRepliesController < Api::V1::BaseController
     )
 
     if reply.save
+      UserNotification.notify_feedback_replied(@feedback, reply)
       response_success({
                          code: 200,
         message: I18n.t("api.common.create_success"),
