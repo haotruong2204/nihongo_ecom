@@ -4,12 +4,7 @@ class Api::V1::Users::FeedbacksController < Api::V1::UserBaseController
   before_action :set_feedback, only: [:show]
 
   def index
-    base = if params.dig(:q, :context_type_eq).present? && params.dig(:q, :context_id_eq).present?
-             Feedback.displayed.roots
-           else
-             current_user.feedbacks.roots
-           end
-    q = base.ransack(params[:q])
+    q = current_user.feedbacks.roots.ransack(params[:q])
     pagy, feedbacks = pagy(q.result.order(created_at: :desc), limit: params[:per_page] || 20)
 
     response_success({
