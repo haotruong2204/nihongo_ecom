@@ -2,6 +2,7 @@
 
 class UserNotification < ApplicationRecord
   belongs_to :user
+  belongs_to :feedback, optional: true
 
   scope :unread, -> { where(read: false) }
   scope :recent, -> { order(created_at: :desc) }
@@ -25,6 +26,7 @@ class UserNotification < ApplicationRecord
         title: "#{name} đã trả lời trong cuộc thảo luận của bạn",
         body: reply.text.truncate(100),
         link: link,
+        feedback_id: reply.id,
         notification_type: "feedback"
       )
     end
@@ -38,6 +40,7 @@ class UserNotification < ApplicationRecord
       title: "Góp ý của bạn đã được duyệt",
       body: feedback.text.truncate(100),
       link: feedback.context_id.present? ? "/tango/#{feedback.context_id}" : nil,
+      feedback_id: feedback.id,
       notification_type: "feedback"
     )
   end
