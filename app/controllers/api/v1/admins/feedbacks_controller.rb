@@ -6,7 +6,7 @@ class Api::V1::Admins::FeedbacksController < Api::V1::BaseController
   before_action :set_feedback, only: [:show, :update, :destroy]
 
   def index
-    q = Feedback.ransack(params[:q])
+    q = Feedback.roots.ransack(params[:q])
     pagy, feedbacks = pagy(q.result.includes(:user).order(created_at: :desc), limit: params[:per_page] || 20)
 
     response_success({
@@ -22,7 +22,7 @@ class Api::V1::Admins::FeedbacksController < Api::V1::BaseController
     response_success({
                        code: 200,
       message: I18n.t("api.common.success"),
-      resource: FeedbackSerializer.new(@feedback, include: [:user]).serializable_hash,
+      resource: FeedbackSerializer.new(@feedback, include: [:user, :replies]).serializable_hash,
       status: :ok
                      })
   end
@@ -37,7 +37,7 @@ class Api::V1::Admins::FeedbacksController < Api::V1::BaseController
       response_success({
                          code: 200,
         message: I18n.t("api.common.update_success"),
-        resource: FeedbackSerializer.new(@feedback.reload, include: [:user]).serializable_hash,
+        resource: FeedbackSerializer.new(@feedback.reload, include: [:user, :replies]).serializable_hash,
         status: :ok
                        })
     else

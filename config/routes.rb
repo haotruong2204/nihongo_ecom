@@ -31,7 +31,9 @@ Rails.application.routes.draw do
       # Admin management
       namespace :admins do
         get "me", to: "dashboard#me"
-        resources :feedbacks, only: [:index, :show, :update, :destroy]
+        resources :feedbacks, only: [:index, :show, :update, :destroy] do
+          resources :replies, only: [:create], controller: "feedback_replies"
+        end
         resources :chat_rooms, only: [:index, :update], param: :uid
         resources :users, only: [:index, :show, :update, :destroy] do
           resources :srs_cards, only: [:index], controller: "user_srs_cards"

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_02_24_030000) do
+ActiveRecord::Schema[8.0].define(version: 2026_02_25_090001) do
   create_table "admins", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -78,7 +78,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_24_030000) do
     t.datetime "replied_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "parent_id"
+    t.string "context_type"
+    t.string "context_id"
+    t.string "context_label"
+    t.index ["context_type", "context_id"], name: "index_feedbacks_on_context_type_and_context_id"
     t.index ["created_at"], name: "index_feedbacks_on_created_at"
+    t.index ["parent_id"], name: "index_feedbacks_on_parent_id"
     t.index ["status"], name: "index_feedbacks_on_status"
     t.index ["user_id"], name: "index_feedbacks_on_user_id"
   end
@@ -191,6 +197,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_24_030000) do
   add_foreign_key "chat_rooms", "users"
   add_foreign_key "contacts", "users"
   add_foreign_key "custom_vocab_items", "users"
+  add_foreign_key "feedbacks", "feedbacks", column: "parent_id", on_delete: :cascade
   add_foreign_key "feedbacks", "users"
   add_foreign_key "jlpt_test_results", "users"
   add_foreign_key "review_logs", "users"

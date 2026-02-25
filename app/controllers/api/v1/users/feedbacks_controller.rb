@@ -4,13 +4,13 @@ class Api::V1::Users::FeedbacksController < Api::V1::UserBaseController
   before_action :set_feedback, only: [:show]
 
   def index
-    q = current_user.feedbacks.ransack(params[:q])
+    q = current_user.feedbacks.roots.ransack(params[:q])
     pagy, feedbacks = pagy(q.result.order(created_at: :desc), limit: params[:per_page] || 20)
 
     response_success({
                        code: 200,
       message: I18n.t("api.common.success"),
-      resource: FeedbackSerializer.new(feedbacks).serializable_hash,
+      resource: FeedbackSerializer.new(feedbacks, include: [:replies]).serializable_hash,
       pagy: pagy_metadata(pagy),
       status: :ok
                      })
@@ -20,7 +20,7 @@ class Api::V1::Users::FeedbacksController < Api::V1::UserBaseController
     response_success({
                        code: 200,
       message: I18n.t("api.common.success"),
-      resource: FeedbackSerializer.new(@feedback).serializable_hash,
+      resource: FeedbackSerializer.new(@feedback, include: [:replies]).serializable_hash,
       status: :ok
                      })
   end
@@ -44,12 +44,12 @@ class Api::V1::Users::FeedbacksController < Api::V1::UserBaseController
   private
 
   def set_feedback
-    @feedback = current_user.feedbacks.find(params[:id])
+    @feedback = current_user.feedbacks.roots.find(params[:id])
   rescue ActiveRecord::RecordNotFound
     not_found
   end
 
   def feedback_params
-    params.require(:feedback).permit(:text, :email)
+    params.require(:feedback).permit(:text, :email, :parent_id, :context_type, :context_id, :context_label)
   end
 end
