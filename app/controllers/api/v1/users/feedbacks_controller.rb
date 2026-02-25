@@ -28,6 +28,7 @@ class Api::V1::Users::FeedbacksController < Api::V1::UserBaseController
   def create
     feedback = current_user.feedbacks.build(feedback_params)
     feedback.email = current_user.email
+    feedback.photo_url = current_user.photo_url
 
     if feedback.save
       response_success({
