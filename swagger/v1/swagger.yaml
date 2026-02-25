@@ -3121,7 +3121,7 @@ paths:
 security:
   - BearerAuth: []
 servers:
-  - url: http://localhost:3000
+  - url: https://api.nhaikanji.com
     variables:
       defaultHost:
-        default: localhost:3000
+        default: api.nhaikanji.com
