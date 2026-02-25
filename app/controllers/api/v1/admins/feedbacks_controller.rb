@@ -33,10 +33,9 @@ class Api::V1::Admins::FeedbacksController < Api::V1::BaseController
 
     if @feedback.update(feedback_params)
       if was_hidden && @feedback.display
+        UserNotification.notify_feedback_approved(@feedback)
         if @feedback.parent_id.present?
           UserNotification.notify_user_replied(@feedback.parent, @feedback)
-        else
-          UserNotification.notify_feedback_approved(@feedback)
         end
       end
       @feedback.update_column(:replied_at, Time.current) if @feedback.admin_reply.present? && @feedback.replied_at.nil?
