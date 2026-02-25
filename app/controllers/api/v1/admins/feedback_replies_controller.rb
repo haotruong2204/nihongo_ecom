@@ -8,6 +8,7 @@ class Api::V1::Admins::FeedbackRepliesController < Api::V1::BaseController
       text: reply_params[:text],
       email: "admin",
       user_id: nil,
+      display: true,
       context_type: @feedback.context_type,
       context_id: @feedback.context_id,
       context_label: @feedback.context_label

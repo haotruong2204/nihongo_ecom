@@ -14,7 +14,7 @@ class Api::V1::PublicFeedbacksController < ApplicationController
     response_success({
                        code: 200,
       message: I18n.t("api.common.success"),
-      resource: FeedbackSerializer.new(feedbacks, include: [:replies]).serializable_hash,
+      resource: PublicFeedbackSerializer.new(feedbacks, include: [:displayed_replies]).serializable_hash,
       pagy: pagy_metadata(pagy),
       status: :ok
                      })
