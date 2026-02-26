@@ -3,5 +3,5 @@
 class AdminNotificationSerializer
   include JSONAPI::Serializer
 
-  attributes :id, :title, :body, :link, :notification_type, :read, :created_at
+  attributes :id, :title, :body, :link, :notification_type, :read, :created_by, :created_at
 end

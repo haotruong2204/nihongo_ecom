@@ -44,6 +44,63 @@ components:
           type: string
           nullable: true
           example: null
+    AdminNotification:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: "Góp ý mới từ User"
+        body:
+          type: string
+          nullable: true
+          example: "Nội dung góp ý..."
+        link:
+          type: string
+          nullable: true
+          example: "/feedback?id=1"
+        notification_type:
+          type: string
+          nullable: true
+          example: "feedback"
+        read:
+          type: boolean
+          example: false
+        created_at:
+          type: string
+          format: date-time
+    UserNotification:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        user_id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: "Thông báo từ admin"
+        body:
+          type: string
+          nullable: true
+          example: "Nội dung thông báo"
+        link:
+          type: string
+          nullable: true
+          example: "/news"
+        notification_type:
+          type: string
+          nullable: true
+          example: "announcement"
+        read:
+          type: boolean
+          example: false
+        created_at:
+          type: string
+          format: date-time
     Pagination:
       type: object
       properties:
@@ -3115,6 +3172,380 @@ paths:
                                 $ref: "#/components/schemas/Feedback"
         "401":
           description: Unauthorized
+        "404":
+          description: Not found
+
+  # ── Admin Notifications (CRUD) ──────────────────────────────────────
+
+  "/api/v1/admins/admin_notifications":
+    get:
+      tags:
+        - Admin - Notifications
+      summary: List admin notifications
+      description: Get paginated list of admin notifications, optionally filter unread only
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 1
+        - name: per_page
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 20
+        - name: unread
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: ["true", "false"]
+      responses:
+        "200":
+          description: List of admin notifications
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  code:
+                    type: integer
+                    example: 200
+                  data:
+                    type: object
+                    properties:
+                      resource:
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                type:
+                                  type: string
+                                  example: admin_notification
+                                attributes:
+                                  $ref: "#/components/schemas/AdminNotification"
+                      pagy:
+                        $ref: "#/components/schemas/Pagination"
+                      unread_count:
+                        type: integer
+                        example: 3
+        "401":
+          description: Unauthorized
+    post:
+      tags:
+        - Admin - Notifications
+      summary: Create admin notification
+      security:
+        - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                admin_notification:
+                  type: object
+                  required:
+                    - title
+                  properties:
+                    title:
+                      type: string
+                      example: "System update"
+                    body:
+                      type: string
+                      example: "Scheduled maintenance tonight"
+                    link:
+                      type: string
+                      example: "/system/status"
+                    notification_type:
+                      type: string
+                      example: "system"
+      responses:
+        "200":
+          description: Notification created
+        "422":
+          description: Validation error
+
+  "/api/v1/admins/admin_notifications/{id}":
+    get:
+      tags:
+        - Admin - Notifications
+      summary: Get admin notification detail
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Notification detail
+        "404":
+          description: Not found
+    patch:
+      tags:
+        - Admin - Notifications
+      summary: Update admin notification
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                admin_notification:
+                  type: object
+                  properties:
+                    title:
+                      type: string
+                    body:
+                      type: string
+                    link:
+                      type: string
+                    notification_type:
+                      type: string
+      responses:
+        "200":
+          description: Notification updated
+        "404":
+          description: Not found
+        "422":
+          description: Validation error
+    delete:
+      tags:
+        - Admin - Notifications
+      summary: Delete admin notification
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Notification deleted
+        "404":
+          description: Not found
+
+  # ── User Notifications (Admin CRUD) ───────────────────────────────
+
+  "/api/v1/admins/user_notifications":
+    get:
+      tags:
+        - Admin - User Notifications
+      summary: List user notifications
+      description: Get paginated list of all user notifications with Ransack filters
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 1
+        - name: per_page
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 20
+        - name: q[user_id_eq]
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: q[notification_type_eq]
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: q[read_eq]
+          in: query
+          required: false
+          schema:
+            type: boolean
+        - name: q[title_cont]
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of user notifications
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  code:
+                    type: integer
+                    example: 200
+                  data:
+                    type: object
+                    properties:
+                      resource:
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                type:
+                                  type: string
+                                  example: user_notification
+                                attributes:
+                                  $ref: "#/components/schemas/UserNotification"
+                      pagy:
+                        $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+    post:
+      tags:
+        - Admin - User Notifications
+      summary: Create user notification
+      description: Send notification to a single user or all users (send_to=all)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: send_to
+          in: query
+          required: false
+          description: Set to "all" to send to all users
+          schema:
+            type: string
+            enum: ["all"]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_notification:
+                  type: object
+                  required:
+                    - title
+                  properties:
+                    user_id:
+                      type: integer
+                      description: Required when send_to is not "all"
+                      example: 1
+                    title:
+                      type: string
+                      example: "Thông báo từ admin"
+                    body:
+                      type: string
+                      example: "Nội dung thông báo"
+                    link:
+                      type: string
+                      example: "/news"
+                    notification_type:
+                      type: string
+                      example: "announcement"
+      responses:
+        "200":
+          description: Notification created
+        "422":
+          description: Validation error
+
+  "/api/v1/admins/user_notifications/{id}":
+    get:
+      tags:
+        - Admin - User Notifications
+      summary: Get user notification detail
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Notification detail
+        "404":
+          description: Not found
+    patch:
+      tags:
+        - Admin - User Notifications
+      summary: Update user notification
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_notification:
+                  type: object
+                  properties:
+                    user_id:
+                      type: integer
+                    title:
+                      type: string
+                    body:
+                      type: string
+                    link:
+                      type: string
+                    notification_type:
+                      type: string
+      responses:
+        "200":
+          description: Notification updated
+        "404":
+          description: Not found
+        "422":
+          description: Validation error
+    delete:
+      tags:
+        - Admin - User Notifications
+      summary: Delete user notification
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Notification deleted
         "404":
           description: Not found
 

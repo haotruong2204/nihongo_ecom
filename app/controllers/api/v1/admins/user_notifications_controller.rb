@@ -1,22 +1,19 @@
 # frozen_string_literal: true
 
-class Api::V1::Admins::AdminNotificationsController < Api::V1::BaseController
+class Api::V1::Admins::UserNotificationsController < Api::V1::BaseController
   include Pagy::Backend
 
   before_action :set_notification, only: [:show, :update, :destroy]
 
   def index
-    q = AdminNotification.ransack(params[:q])
-    notifications = q.result.recent
-    notifications = notifications.unread if params[:unread] == "true"
-    pagy, records = pagy(notifications, limit: params[:per_page] || 20)
+    q = UserNotification.ransack(params[:q])
+    pagy, records = pagy(q.result.recent, limit: params[:per_page] || 20)
 
     response_success({
       code: 200,
       message: I18n.t("api.common.success"),
-      resource: AdminNotificationSerializer.new(records).serializable_hash,
+      resource: UserNotificationSerializer.new(records).serializable_hash,
       pagy: pagy_metadata(pagy),
-      unread_count: AdminNotification.unread.count,
       status: :ok
     })
   end
@@ -25,23 +22,36 @@ class Api::V1::Admins::AdminNotificationsController < Api::V1::BaseController
     response_success({
       code: 200,
       message: I18n.t("api.common.success"),
-      resource: AdminNotificationSerializer.new(@notification).serializable_hash,
+      resource: UserNotificationSerializer.new(@notification).serializable_hash,
       status: :ok
     })
   end
 
   def create
-    notification = AdminNotification.new(notification_params.merge(created_by: "admin"))
+    if params[:send_to] == "all"
+      notifications = User.find_each.map do |user|
+        UserNotification.create!(notification_params.merge(user_id: user.id, created_by: "admin"))
+      end
 
-    if notification.save
       response_success({
         code: 201,
         message: I18n.t("api.common.create_success"),
-        resource: AdminNotificationSerializer.new(notification).serializable_hash,
+        resource: UserNotificationSerializer.new(notifications).serializable_hash,
         status: :created
       })
     else
-      unprocessable_entity(notification)
+      notification = UserNotification.new(notification_params.merge(created_by: "admin"))
+
+      if notification.save
+        response_success({
+          code: 201,
+          message: I18n.t("api.common.create_success"),
+          resource: UserNotificationSerializer.new(notification).serializable_hash,
+          status: :created
+        })
+      else
+        unprocessable_entity(notification)
+      end
     end
   end
 
@@ -50,7 +60,7 @@ class Api::V1::Admins::AdminNotificationsController < Api::V1::BaseController
       response_success({
         code: 200,
         message: I18n.t("api.common.update_success"),
-        resource: AdminNotificationSerializer.new(@notification).serializable_hash,
+        resource: UserNotificationSerializer.new(@notification).serializable_hash,
         status: :ok
       })
     else
@@ -63,26 +73,16 @@ class Api::V1::Admins::AdminNotificationsController < Api::V1::BaseController
     response_success({ code: 200, message: I18n.t("api.common.delete_success"), status: :ok })
   end
 
-  def mark_read
-    if params[:id] == "all"
-      AdminNotification.unread.update_all(read: true)
-    else
-      AdminNotification.find(params[:id]).update!(read: true)
-    end
-
-    response_success({ code: 200, message: I18n.t("api.common.update_success"), status: :ok })
-  end
-
   private
 
   def set_notification
-    @notification = AdminNotification.find(params[:id])
+    @notification = UserNotification.find(params[:id])
   rescue ActiveRecord::RecordNotFound
     not_found
   end
 
   def notification_params
-    params.require(:admin_notification).permit(:title, :body, :link, :notification_type)
+    params.require(:user_notification).permit(:user_id, :title, :body, :link, :notification_type)
   end
 
   def pagy_metadata(pagy)

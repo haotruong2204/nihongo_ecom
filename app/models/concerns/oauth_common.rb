@@ -14,12 +14,14 @@ module OauthCommon
     user = find_by(uid: uid, provider: provider) ||
            find_by(email: data["email"]) ||
            new(provider: provider)
+    is_new_user = user.new_record?
     user.uid = uid
     user.email = data["email"]
     user.display_name = data["name"] || data["display_name"]
     user.photo_url = data["picture"] || data["photo_url"]
     user.last_login_at = Time.current
     user.save!
+    UserNotification.create_welcome(user) if is_new_user
     user
   end
 

@@ -1,10 +1,19 @@
 # frozen_string_literal: true
 
 class AdminNotification < ApplicationRecord
+  NOTIFICATION_TYPES = %w[feedback new_feature upgrade_success maintenance welcome warning].freeze
+  CREATED_BY_OPTIONS = %w[system admin].freeze
+
   scope :unread, -> { where(read: false) }
   scope :recent, -> { order(created_at: :desc) }
 
   validates :title, presence: true
+  validates :notification_type, inclusion: { in: NOTIFICATION_TYPES }
+  validates :created_by, inclusion: { in: CREATED_BY_OPTIONS }
+
+  def self.ransackable_attributes(_auth_object = nil)
+    %w[title notification_type read created_at created_by]
+  end
 
   def self.create_for_feedback(feedback)
     is_reply = feedback.parent_id.present?

@@ -42,7 +42,7 @@ Rails.application.routes.draw do
         resources :feedbacks, only: [:index, :show, :update, :destroy] do
           resources :replies, only: [:create], controller: "feedback_replies"
         end
-        resources :admin_notifications, only: [:index] do
+        resources :admin_notifications, only: [:index, :show, :create, :update, :destroy] do
           collection do
             patch :mark_read
           end
@@ -50,6 +50,7 @@ Rails.application.routes.draw do
             patch :mark_read
           end
         end
+        resources :user_notifications, only: [:index, :show, :create, :update, :destroy]
         resources :chat_rooms, only: [:index, :update], param: :uid
         resources :users, only: [:index, :show, :update, :destroy] do
           resources :srs_cards, only: [:index], controller: "user_srs_cards"
