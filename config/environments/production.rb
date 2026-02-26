@@ -69,6 +69,9 @@ Rails.application.configure do
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
+  # Allow Action Cable access from any origin (JWT auth handles security).
+  config.action_cable.disable_request_forgery_protection = true
+
   # Only use :id for inspections in production.
   config.active_record.attributes_for_inspect = [ :id ]
 
