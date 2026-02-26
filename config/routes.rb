@@ -2,6 +2,8 @@ require "sidekiq/web"
 require "sidekiq/cron/web"
 
 Rails.application.routes.draw do
+  Sidekiq::Web.use ActionDispatch::Cookies
+  Sidekiq::Web.use ActionDispatch::Session::CookieStore, key: "_sidekiq_session"
   mount Sidekiq::Web => "/sidekiq"
   mount ActionCable.server => "/cable"
   mount Rswag::Ui::Engine => "/api/docs"
