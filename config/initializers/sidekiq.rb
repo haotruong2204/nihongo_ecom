@@ -8,6 +8,12 @@ Sidekiq.configure_server do |config|
         "class" => "CleanupInactiveUsersJob",
         "queue" => "default",
         "description" => "Delete SRS, review logs, roadmap data for users inactive 15+ days"
+      },
+      "cleanup_notifications" => {
+        "cron" => "0 2 * * *", # Every day at 2:00 AM
+        "class" => "CleanupNotificationsJob",
+        "queue" => "default",
+        "description" => "Delete notifications older than 15 days"
       }
     }
 
