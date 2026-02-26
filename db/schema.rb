@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_02_25_120001) do
+ActiveRecord::Schema[8.0].define(version: 2026_02_25_120002) do
   create_table "admin_notifications", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "title", null: false
     t.text "body"
@@ -188,6 +188,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_25_120001) do
     t.boolean "read", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "feedback_id"
+    t.index ["feedback_id"], name: "index_user_notifications_on_feedback_id"
     t.index ["user_id", "read"], name: "index_user_notifications_on_user_id_and_read"
     t.index ["user_id"], name: "index_user_notifications_on_user_id"
   end
@@ -231,6 +233,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_25_120001) do
   add_foreign_key "roadmap_day_progresses", "users"
   add_foreign_key "srs_cards", "users"
   add_foreign_key "tango_lesson_progresses", "users"
+  add_foreign_key "user_notifications", "feedbacks", on_delete: :cascade
   add_foreign_key "user_notifications", "users"
   add_foreign_key "user_settings", "users"
 end
