@@ -13,11 +13,11 @@ class AdminNotification < ApplicationRecord
   validates :notification_type, inclusion: { in: NOTIFICATION_TYPES }
   validates :created_by, inclusion: { in: CREATED_BY_OPTIONS }
 
-  def self.ransackable_attributes(_auth_object = nil)
+  def self.ransackable_attributes _auth_object = nil
     %w[title notification_type read created_at created_by]
   end
 
-  def self.create_for_feedback(feedback)
+  def self.create_for_feedback feedback
     is_reply = feedback.parent_id.present?
     name = feedback.display_name || feedback.email
     feedback_id = is_reply ? feedback.parent_id : feedback.id
@@ -34,8 +34,8 @@ class AdminNotification < ApplicationRecord
 
   def broadcast_to_admins
     ActionCable.server.broadcast("admin_notifications", {
-      type: "new_notification",
+                                   type: "new_notification",
       notification: AdminNotificationSerializer.new(self).serializable_hash[:data]
-    })
+                                 })
   end
 end

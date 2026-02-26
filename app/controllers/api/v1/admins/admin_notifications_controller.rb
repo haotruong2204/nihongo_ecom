@@ -12,22 +12,22 @@ class Api::V1::Admins::AdminNotificationsController < Api::V1::BaseController
     pagy, records = pagy(notifications, limit: params[:per_page] || 20)
 
     response_success({
-      code: 200,
+                       code: 200,
       message: I18n.t("api.common.success"),
       resource: AdminNotificationSerializer.new(records).serializable_hash,
       pagy: pagy_metadata(pagy),
       unread_count: AdminNotification.unread.count,
       status: :ok
-    })
+                     })
   end
 
   def show
     response_success({
-      code: 200,
+                       code: 200,
       message: I18n.t("api.common.success"),
       resource: AdminNotificationSerializer.new(@notification).serializable_hash,
       status: :ok
-    })
+                     })
   end
 
   def create
@@ -35,11 +35,11 @@ class Api::V1::Admins::AdminNotificationsController < Api::V1::BaseController
 
     if notification.save
       response_success({
-        code: 201,
+                         code: 201,
         message: I18n.t("api.common.create_success"),
         resource: AdminNotificationSerializer.new(notification).serializable_hash,
         status: :created
-      })
+                       })
     else
       unprocessable_entity(notification)
     end
@@ -48,11 +48,11 @@ class Api::V1::Admins::AdminNotificationsController < Api::V1::BaseController
   def update
     if @notification.update(notification_params)
       response_success({
-        code: 200,
+                         code: 200,
         message: I18n.t("api.common.update_success"),
         resource: AdminNotificationSerializer.new(@notification).serializable_hash,
         status: :ok
-      })
+                       })
     else
       unprocessable_entity(@notification)
     end
@@ -85,7 +85,7 @@ class Api::V1::Admins::AdminNotificationsController < Api::V1::BaseController
     params.require(:admin_notification).permit(:title, :body, :link, :notification_type)
   end
 
-  def pagy_metadata(pagy)
+  def pagy_metadata pagy
     {
       current_page: pagy.page,
       total_pages: pagy.pages,

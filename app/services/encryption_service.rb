@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 class EncryptionService
-  ALGORITHM = "aes-256-cbc".freeze
+  ALGORITHM = "aes-256-cbc"
 
   class << self
-    def encrypt(plaintext)
+    def encrypt plaintext
       aes_key, iv, encrypted_data = aes_encrypt(plaintext)
       encrypted_key = rsa_encrypt(aes_key)
 
@@ -15,17 +17,17 @@ class EncryptionService
 
     private
 
-    def aes_encrypt(plaintext)
+    def aes_encrypt plaintext
       cipher = OpenSSL::Cipher.new(ALGORITHM)
       cipher.encrypt
       key = cipher.random_key
       iv = cipher.random_iv
       encrypted = cipher.update(plaintext) + cipher.final
 
-      [ key, iv, encrypted ]
+      [key, iv, encrypted]
     end
 
-    def rsa_encrypt(data)
+    def rsa_encrypt data
       rsa_key = OpenSSL::PKey::RSA.new(rsa_public_key_pem)
       rsa_key.public_encrypt(data, OpenSSL::PKey::RSA::PKCS1_OAEP_PADDING)
     end

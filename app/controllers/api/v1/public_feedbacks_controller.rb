@@ -22,7 +22,7 @@ class Api::V1::PublicFeedbacksController < ApplicationController
 
   private
 
-  def pagy_metadata(pagy)
+  def pagy_metadata pagy
     {
       current_page: pagy.page,
       total_pages: pagy.pages,

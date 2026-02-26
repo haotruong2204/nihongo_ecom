@@ -10,21 +10,21 @@ class Api::V1::Admins::UserNotificationsController < Api::V1::BaseController
     pagy, records = pagy(q.result.recent, limit: params[:per_page] || 20)
 
     response_success({
-      code: 200,
+                       code: 200,
       message: I18n.t("api.common.success"),
       resource: UserNotificationSerializer.new(records).serializable_hash,
       pagy: pagy_metadata(pagy),
       status: :ok
-    })
+                     })
   end
 
   def show
     response_success({
-      code: 200,
+                       code: 200,
       message: I18n.t("api.common.success"),
       resource: UserNotificationSerializer.new(@notification).serializable_hash,
       status: :ok
-    })
+                     })
   end
 
   def create
@@ -34,21 +34,21 @@ class Api::V1::Admins::UserNotificationsController < Api::V1::BaseController
       end
 
       response_success({
-        code: 201,
+                         code: 201,
         message: I18n.t("api.common.create_success"),
         resource: UserNotificationSerializer.new(notifications).serializable_hash,
         status: :created
-      })
+                       })
     else
       notification = UserNotification.new(notification_params.merge(created_by: "admin"))
 
       if notification.save
         response_success({
-          code: 201,
+                           code: 201,
           message: I18n.t("api.common.create_success"),
           resource: UserNotificationSerializer.new(notification).serializable_hash,
           status: :created
-        })
+                         })
       else
         unprocessable_entity(notification)
       end
@@ -58,11 +58,11 @@ class Api::V1::Admins::UserNotificationsController < Api::V1::BaseController
   def update
     if @notification.update(notification_params)
       response_success({
-        code: 200,
+                         code: 200,
         message: I18n.t("api.common.update_success"),
         resource: UserNotificationSerializer.new(@notification).serializable_hash,
         status: :ok
-      })
+                       })
     else
       unprocessable_entity(@notification)
     end
@@ -85,7 +85,7 @@ class Api::V1::Admins::UserNotificationsController < Api::V1::BaseController
     params.require(:user_notification).permit(:user_id, :title, :body, :link, :notification_type)
   end
 
-  def pagy_metadata(pagy)
+  def pagy_metadata pagy
     {
       current_page: pagy.page,
       total_pages: pagy.pages,

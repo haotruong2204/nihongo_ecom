@@ -1,15 +1,17 @@
+# frozen_string_literal: true
+
 class ResponseEncryptor
   SKIP_PATHS = %w[/health /api-docs].freeze
 
-  def initialize(app)
+  def initialize app
     @app = app
   end
 
-  def call(env)
+  def call env
     status, headers, response = @app.call(env)
 
     # Skip encryption for preflight OPTIONS requests
-    return [ status, headers, response ] if env["REQUEST_METHOD"] == "OPTIONS"
+    return [status, headers, response] if env["REQUEST_METHOD"] == "OPTIONS"
 
     if should_encrypt?(env, headers)
       begin
@@ -21,19 +23,19 @@ class ResponseEncryptor
         headers["Content-Length"] = encrypted_json.bytesize.to_s
         headers["X-Encrypted"] = "true"
 
-        response = [ encrypted_json ]
-      rescue => e
+        response = [encrypted_json]
+      rescue StandardError => e
         Rails.logger.error("[ResponseEncryptor] Encryption failed: #{e.message}")
         # Return original response if encryption fails
       end
     end
 
-    [ status, headers, response ]
+    [status, headers, response]
   end
 
   private
 
-  def should_encrypt?(env, headers)
+  def should_encrypt? env, headers
     path = env["PATH_INFO"]
 
     return false unless path&.start_with?("/api/")
@@ -45,16 +47,16 @@ class ResponseEncryptor
     true
   end
 
-  def skip_path?(path)
+  def skip_path? path
     SKIP_PATHS.any? { |skip| path.start_with?(skip) }
   end
 
-  def json_response?(headers)
+  def json_response? headers
     content_type = headers["Content-Type"].to_s
     content_type.include?("application/json")
   end
 
-  def skip_encryption_header?(env)
+  def skip_encryption_header? env
     Rails.env.development? && env["HTTP_X_SKIP_ENCRYPTION"] == "true"
   end
 
@@ -62,7 +64,7 @@ class ResponseEncryptor
     ENV["RSA_PUBLIC_KEY_PATH"].present? || ENV["RSA_PUBLIC_KEY"].present?
   end
 
-  def extract_body(response)
+  def extract_body response
     body = +""
     response.each { |part| body << part }
     response.close if response.respond_to?(:close)

@@ -11,9 +11,7 @@ module OauthCommon
     raise "UID not found in provider data" unless uid
 
     # Find by uid first, then fall back to email (handles Firebase-synced users)
-    user = find_by(uid: uid, provider: provider) ||
-           find_by(email: data["email"]) ||
-           new(provider: provider)
+    user = find_by(uid: uid, provider: provider) || find_by(email: data["email"]) || new(provider: provider)
     is_new_user = user.new_record?
     user.uid = uid
     user.email = data["email"]

@@ -17,15 +17,15 @@ class UserNotification < ApplicationRecord
   validates :notification_type, inclusion: { in: NOTIFICATION_TYPES }
   validates :created_by, inclusion: { in: CREATED_BY_OPTIONS }
 
-  def self.ransackable_attributes(_auth_object = nil)
+  def self.ransackable_attributes _auth_object = nil
     %w[title notification_type read created_at user_id created_by]
   end
 
-  def self.ransackable_associations(_auth_object = nil)
+  def self.ransackable_associations _auth_object = nil
     %w[user]
   end
 
-  def self.create_welcome(user)
+  def self.create_welcome user
     create(
       user_id: user.id,
       title: "Chào mừng đến với website!",
@@ -35,7 +35,7 @@ class UserNotification < ApplicationRecord
     )
   end
 
-  def self.notify_user_replied(parent_feedback, reply)
+  def self.notify_user_replied parent_feedback, reply
     # Collect all participants: root author + all repliers, exclude reply author
     participant_ids = [parent_feedback.user_id].compact
     participant_ids += parent_feedback.replies.where.not(user_id: nil).pluck(:user_id)
@@ -58,7 +58,7 @@ class UserNotification < ApplicationRecord
     end
   end
 
-  def self.notify_feedback_approved(feedback)
+  def self.notify_feedback_approved feedback
     return unless feedback.user_id
 
     create(
@@ -75,15 +75,12 @@ class UserNotification < ApplicationRecord
 
   def broadcast_to_user
     ActionCable.server.broadcast("user_notifications_#{user_id}", {
-      type: "new_notification",
+                                   type: "new_notification",
       notification: UserNotificationSerializer.new(self).serializable_hash[:data]
-    })
+                                 })
   end
 
   def broadcast_delete_to_user
-    ActionCable.server.broadcast("user_notifications_#{user_id}", {
-      type: "delete_notification",
-      notification_id: id
-    })
+    ActionCable.server.broadcast("user_notifications_#{user_id}", { type: "delete_notification", notification_id: id })
   end
 end

@@ -19,10 +19,10 @@ class Api::V1::Admins::ChatRoomsController < Api::V1::BaseController
     rooms = ChatRoom.includes(:user).where(uid: uids)
 
     response_success({
-      code: 200,
+                       code: 200,
       message: I18n.t("api.common.success"),
       resource: ChatRoomSerializer.new(rooms).serializable_hash
-    })
+                     })
   end
 
   def update
@@ -31,11 +31,11 @@ class Api::V1::Admins::ChatRoomsController < Api::V1::BaseController
 
     if room.update(chat_room_params)
       response_success({
-        code: 200,
+                         code: 200,
         message: I18n.t("api.common.update_success"),
         resource: ChatRoomSerializer.new(room).serializable_hash,
         status: :ok
-      })
+                       })
     else
       unprocessable_entity(room)
     end
