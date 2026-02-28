@@ -14,7 +14,7 @@ git pull origin main
 
 # 2. Build new images
 echo "→ Building images..."
-docker compose -f $COMPOSE_FILE build web
+docker compose -f $COMPOSE_FILE build web sidekiq
 
 # 3. Run migrations
 echo "→ Running migrations..."
