@@ -41,6 +41,7 @@ Rails.application.routes.draw do
         end
         get "chat_status", to: "chat_status#show"
         post "chat_messages", to: "chat_status#record_message"
+        resources :quick_replies, only: [:index]
       end
 
       # Admin management
@@ -58,6 +59,7 @@ Rails.application.routes.draw do
           end
         end
         resources :user_notifications, only: [:index, :show, :create, :update, :destroy]
+        resources :quick_replies
         resources :chat_rooms, only: [:index, :update], param: :uid
         resources :users, only: [:index, :show, :update, :destroy] do
           resources :srs_cards, only: [:index], controller: "user_srs_cards"
