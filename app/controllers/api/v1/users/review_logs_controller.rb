@@ -49,6 +49,6 @@ class Api::V1::Users::ReviewLogsController < Api::V1::UserBaseController
   end
 
   def review_log_params
-    params.require(:review_log).permit(:kanji, :rating, :interval_before, :interval_after, :reviewed_at)
+    params.require(:review_log).permit(:kanji, :rating, :interval_before, :interval_after, :reviewed_at, :duration_ms)
   end
 end

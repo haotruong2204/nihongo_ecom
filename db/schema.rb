@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_02_28_110001) do
+ActiveRecord::Schema[8.0].define(version: 2026_02_28_120001) do
   create_table "admin_notifications", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "title", null: false
     t.text "body"
@@ -141,6 +141,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_28_110001) do
     t.integer "interval_after", default: 0, null: false, unsigned: true
     t.datetime "reviewed_at", null: false
     t.datetime "created_at", null: false
+    t.integer "duration_ms", unsigned: true
     t.index ["user_id", "kanji"], name: "index_review_logs_on_user_id_and_kanji"
     t.index ["user_id", "reviewed_at"], name: "index_review_logs_on_user_id_and_reviewed_at"
     t.index ["user_id"], name: "index_review_logs_on_user_id"
