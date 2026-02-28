@@ -20,11 +20,15 @@ docker compose -f $COMPOSE_FILE build web sidekiq
 echo "→ Running migrations..."
 docker compose -f $COMPOSE_FILE run --rm web bin/rails db:migrate
 
-# 4. Restart app + sidekiq (nginx/db/redis giữ nguyên)
+# 4. Restart app + sidekiq
 echo "→ Restarting app..."
 docker compose -f $COMPOSE_FILE up -d web sidekiq
 
-# 5. Wait and health check
+# 5. Restart nginx (resolve new container IP after recreate)
+echo "→ Restarting nginx..."
+docker compose -f $COMPOSE_FILE restart nginx
+
+# 6. Wait and health check
 echo "→ Waiting for app to start..."
 sleep 10
 
@@ -37,7 +41,7 @@ fi
 
 echo "✓ Health check passed"
 
-# 6. Cleanup old images
+# 7. Cleanup old images
 echo "→ Cleaning up old images..."
 docker image prune -f
 
