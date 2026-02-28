@@ -2,6 +2,7 @@
 
 class Api::V1::Users::SrsCardsController < Api::V1::UserBaseController
   before_action :set_srs_card, only: [:show, :update, :destroy]
+  before_action :require_srs_card, only: [:show, :update]
 
   def index
     q = current_user.srs_cards.ransack(params[:q])
@@ -26,7 +27,8 @@ class Api::V1::Users::SrsCardsController < Api::V1::UserBaseController
   end
 
   def create
-    srs_card = current_user.srs_cards.build(srs_card_params)
+    srs_card = current_user.srs_cards.find_or_initialize_by(kanji: srs_card_params[:kanji])
+    srs_card.assign_attributes(srs_card_params) if srs_card.new_record?
 
     if srs_card.save
       response_success({
@@ -54,16 +56,18 @@ class Api::V1::Users::SrsCardsController < Api::V1::UserBaseController
   end
 
   def destroy
-    @srs_card.destroy!
+    @srs_card&.destroy
     response_success({ code: 200, message: I18n.t("api.common.delete_success"), status: :ok })
   end
 
   private
 
   def set_srs_card
-    @srs_card = current_user.srs_cards.find(params[:id])
-  rescue ActiveRecord::RecordNotFound
-    not_found
+    @srs_card = current_user.srs_cards.find_by(id: params[:id])
+  end
+
+  def require_srs_card
+    not_found unless @srs_card
   end
 
   def srs_card_params
