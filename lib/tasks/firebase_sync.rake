@@ -30,36 +30,43 @@ namespace :firebase do
 
     puts "Syncing #{docs.size} users..."
 
-    ActiveRecord::Base.transaction do
-      docs.each do |doc|
+    existing_emails = User.pluck(:email).to_set
+    existing_uids = User.pluck(:uid).to_set
+
+    docs.each_slice(500) do |batch_docs|
+      rows = []
+
+      batch_docs.each do |doc|
         data = service.parse_document(doc)
         uid = service.document_id(doc)
         email = data["email"] || "#{uid}@firebase.local"
 
-        user = User.find_or_initialize_by(uid: uid)
-
-        # Nếu user mới mà email đã tồn tại ở user khác → skip
-        if user.new_record? && User.exists?(email: email)
+        # Skip new user if email already belongs to another user
+        if !existing_uids.include?(uid) && existing_emails.include?(email)
           skipped += 1
           next
         end
 
-        user.assign_attributes(
+        rows << {
+          uid: uid,
           email: email,
           display_name: data["displayName"],
           photo_url: data["photoURL"],
           provider: data["provider"] || "google",
           is_premium: data["isPremium"] || false,
           premium_until: parse_timestamp(data["premiumUntil"]),
-          last_login_at: parse_timestamp(data["lastLogin"])
-        )
+          last_login_at: parse_timestamp(data["lastLogin"]),
+          created_at: parse_timestamp(data["createdAt"]) || Time.current,
+          updated_at: Time.current
+        }
 
-        if user.new_record?
-          user.created_at = parse_timestamp(data["createdAt"]) if data["createdAt"]
-        end
+        existing_uids.add(uid)
+        existing_emails.add(email)
+      end
 
-        user.save!
-        synced += 1
+      if rows.any?
+        User.upsert_all(rows, unique_by: :uid)
+        synced += rows.size
       end
     end
 
@@ -77,8 +84,8 @@ namespace :firebase do
     # Pre-load user uid→id mapping
     user_map = User.pluck(:uid, :id).to_h
 
-    ActiveRecord::Base.transaction do
-      docs.each do |doc|
+    docs.each_slice(500) do |batch_docs|
+      batch_docs.each do |doc|
         data = service.parse_document(doc)
         user_id = user_map[data["uid"]] if data["uid"]
 
@@ -120,7 +127,7 @@ namespace :firebase do
     skipped = 0
 
     if active_only
-      active_uids = User.where("last_login_at >= ?", 10.days.ago).pluck(:uid)
+      active_uids = User.where("last_login_at >= ?", 10.days.ago).pluck(:uid).to_set
       puts "Syncing roadmap for #{active_uids.size} active users (from #{docs.size} docs)..."
     else
       puts "Syncing #{docs.size} roadmap_progress documents..."
@@ -128,8 +135,10 @@ namespace :firebase do
 
     user_map = User.pluck(:uid, :id).to_h
 
-    ActiveRecord::Base.transaction do
-      docs.each do |doc|
+    docs.each_slice(500) do |batch_docs|
+      rows = []
+
+      batch_docs.each do |doc|
         uid = service.document_id(doc)
         data = service.parse_document(doc)
         user_id = user_map[uid]
@@ -154,18 +163,23 @@ namespace :firebase do
           kanji_learned = day_data.is_a?(Hash) ? day_data["kanjiLearned"] : nil
           completed_at = day_data.is_a?(Hash) ? parse_timestamp(day_data["completedAt"]) : nil
 
-          # Default values if missing
           kanji_learned = kanji_learned.is_a?(Array) ? kanji_learned : []
           completed_at ||= Time.current
 
-          progress = RoadmapDayProgress.find_or_initialize_by(user_id: user_id, day: day_num)
-          progress.assign_attributes(
-            kanji_learned: kanji_learned,
-            completed_at: completed_at
-          )
-          progress.save!
-          synced += 1
+          rows << {
+            user_id: user_id,
+            day: day_num,
+            kanji_learned: kanji_learned.to_json,
+            completed_at: completed_at,
+            created_at: Time.current,
+            updated_at: Time.current
+          }
         end
+      end
+
+      if rows.any?
+        RoadmapDayProgress.upsert_all(rows, unique_by: %i[user_id day])
+        synced += rows.size
       end
     end
 
@@ -181,7 +195,7 @@ namespace :firebase do
     skipped = 0
     errors = 0
 
-    active_uids = active_only ? User.where("last_login_at >= ?", 10.days.ago).pluck(:uid) : nil
+    active_uids = active_only ? User.where("last_login_at >= ?", 10.days.ago).pluck(:uid).to_set : nil
     target_count = active_only ? active_uids.size : user_docs.size
     puts "Syncing SRS cards for #{target_count} #{active_only ? 'active ' : ''}users..."
 
@@ -206,26 +220,29 @@ namespace :firebase do
         parent_path = user_doc["name"]
         srs_docs = service.fetch_subcollection(parent_path, "srs")
 
-        ActiveRecord::Base.transaction do
-          srs_docs.each do |srs_doc|
-            data = service.parse_document(srs_doc)
-            kanji = data["kanji"] || service.document_id(srs_doc)
+        rows = srs_docs.map do |srs_doc|
+          data = service.parse_document(srs_doc)
+          kanji = data["kanji"] || service.document_id(srs_doc)
+          state = SrsCard.states[map_srs_state(data["state"]).to_s]
 
-            state = map_srs_state(data["state"])
+          {
+            user_id: user_id,
+            kanji: kanji,
+            state: state,
+            ease: (data["ease"] || 2.5).to_f.clamp(1.3, Float::INFINITY),
+            interval: safe_unsigned_int(data["interval"] || 0),
+            due_date: safe_timestamp(parse_timestamp(data["dueDate"])) || Time.current,
+            reviews_count: safe_unsigned_int(data["reviews"] || 0),
+            lapses_count: safe_unsigned_int(data["lapses"] || 0),
+            last_review_at: parse_timestamp(data["lastReview"]),
+            created_at: Time.current,
+            updated_at: Time.current
+          }
+        end
 
-            card = SrsCard.find_or_initialize_by(user_id: user_id, kanji: kanji)
-            card.assign_attributes(
-              state: state,
-              ease: (data["ease"] || 2.5).to_f.clamp(1.3, Float::INFINITY),
-              interval: safe_unsigned_int(data["interval"] || 0),
-              due_date: safe_timestamp(parse_timestamp(data["dueDate"])) || Time.current,
-              reviews_count: safe_unsigned_int(data["reviews"] || 0),
-              lapses_count: safe_unsigned_int(data["lapses"] || 0),
-              last_review_at: parse_timestamp(data["lastReview"])
-            )
-            card.save!
-            synced += 1
-          end
+        if rows.any?
+          SrsCard.upsert_all(rows, unique_by: %i[user_id kanji])
+          synced += rows.size
         end
       rescue Net::OpenTimeout, Net::ReadTimeout, Errno::ECONNRESET => e
         retries += 1
@@ -254,7 +271,7 @@ namespace :firebase do
     skipped = 0
     errors = 0
 
-    active_uids = active_only ? User.where("last_login_at >= ?", 10.days.ago).pluck(:uid) : nil
+    active_uids = active_only ? User.where("last_login_at >= ?", 10.days.ago).pluck(:uid).to_set : nil
     target_count = active_only ? active_uids.size : user_docs.size
     puts "Syncing review logs for #{target_count} #{active_only ? 'active ' : ''}users..."
 
@@ -279,25 +296,25 @@ namespace :firebase do
         parent_path = user_doc["name"]
         log_docs = service.fetch_subcollection(parent_path, "review_logs")
 
-        ActiveRecord::Base.transaction do
-          log_docs.each do |log_doc|
-            data = service.parse_document(log_doc)
-            reviewed_at = parse_timestamp(data["timestamp"]) || Time.current
-            rating = map_review_rating(data["rating"])
+        rows = log_docs.map do |log_doc|
+          data = service.parse_document(log_doc)
+          reviewed_at = parse_timestamp(data["timestamp"]) || Time.current
+          rating = ReviewLog.ratings[map_review_rating(data["rating"]).to_s]
 
-            log = ReviewLog.find_or_initialize_by(
-              user_id: user_id,
-              kanji: data["kanji"],
-              reviewed_at: reviewed_at
-            )
-            log.assign_attributes(
-              rating: rating,
-              interval_before: safe_unsigned_int(data["intervalBefore"] || 0),
-              interval_after: safe_unsigned_int(data["intervalAfter"] || 0)
-            )
-            log.save!
-            synced += 1
-          end
+          {
+            user_id: user_id,
+            kanji: data["kanji"],
+            reviewed_at: reviewed_at,
+            rating: rating,
+            interval_before: safe_unsigned_int(data["intervalBefore"] || 0),
+            interval_after: safe_unsigned_int(data["intervalAfter"] || 0),
+            created_at: Time.current
+          }
+        end
+
+        if rows.any?
+          ReviewLog.upsert_all(rows, unique_by: %i[user_id kanji reviewed_at])
+          synced += rows.size
         end
       rescue Net::OpenTimeout, Net::ReadTimeout, Errno::ECONNRESET => e
         retries += 1

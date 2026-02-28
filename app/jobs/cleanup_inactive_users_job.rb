@@ -5,20 +5,14 @@ class CleanupInactiveUsersJob < ApplicationJob
 
   def perform
     cutoff = 15.days.ago
-    inactive_users = User.where("last_login_at < ? OR last_login_at IS NULL", cutoff)
+    inactive_user_ids = User.where("last_login_at < ? OR last_login_at IS NULL", cutoff).ids
 
-    deleted_srs = 0
-    deleted_reviews = 0
-    deleted_roadmap = 0
-
-    inactive_users.find_each do |user|
-      deleted_srs += user.srs_cards.delete_all
-      deleted_reviews += user.review_logs.delete_all
-      deleted_roadmap += user.roadmap_day_progresses.delete_all
-    end
+    deleted_srs = SrsCard.where(user_id: inactive_user_ids).delete_all
+    deleted_reviews = ReviewLog.where(user_id: inactive_user_ids).delete_all
+    deleted_roadmap = RoadmapDayProgress.where(user_id: inactive_user_ids).delete_all
 
     Rails.logger.info(
-      "[CleanupInactiveUsersJob] Users: #{inactive_users.count}, " \
+      "[CleanupInactiveUsersJob] Users: #{inactive_user_ids.size}, " \
       "SRS: #{deleted_srs}, Reviews: #{deleted_reviews}, Roadmap: #{deleted_roadmap}"
     )
   end

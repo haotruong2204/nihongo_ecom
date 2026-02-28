@@ -10,8 +10,8 @@ class UserNotification < ApplicationRecord
   scope :unread, -> { where(read: false) }
   scope :recent, -> { order(created_at: :desc) }
 
-  after_create_commit :broadcast_to_user
-  after_destroy_commit :broadcast_delete_to_user
+  after_create_commit { BroadcastNotificationJob.perform_later(id, "created") }
+  after_destroy_commit { BroadcastNotificationJob.perform_later(id, "destroyed") }
 
   validates :title, presence: true
   validates :notification_type, inclusion: { in: NOTIFICATION_TYPES }
@@ -71,16 +71,4 @@ class UserNotification < ApplicationRecord
     )
   end
 
-  private
-
-  def broadcast_to_user
-    ActionCable.server.broadcast("user_notifications_#{user_id}", {
-                                   type: "new_notification",
-      notification: UserNotificationSerializer.new(self).serializable_hash[:data]
-                                 })
-  end
-
-  def broadcast_delete_to_user
-    ActionCable.server.broadcast("user_notifications_#{user_id}", { type: "delete_notification", notification_id: id })
-  end
 end

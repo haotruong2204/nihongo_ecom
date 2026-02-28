@@ -3,7 +3,7 @@ default: &default
   encoding: utf8mb4
   charset: utf8mb4
   collation: utf8mb4_unicode_ci
-  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  pool: <%= ENV.fetch("DB_POOL") { ENV.fetch("RAILS_MAX_THREADS", 5).to_i + ENV.fetch("SIDEKIQ_CONCURRENCY", 5).to_i + 2 } %>
   username: <%= ENV.fetch("DB_USER", "root") %>
   password: <%= ENV.fetch("NIHONGO_ECOM_DATABASE_PASSWORD", "password") %>
   port: <%= ENV.fetch("DB_PORT", "3306").to_i %>
