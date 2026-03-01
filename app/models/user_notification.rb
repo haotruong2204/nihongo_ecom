@@ -58,6 +58,17 @@ class UserNotification < ApplicationRecord
     end
   end
 
+  def self.notify_session_conflict_warning user
+    create(
+      user_id: user.id,
+      title: "Cảnh báo: Tài khoản của bạn đang được sử dụng ở nhiều nơi",
+      body: "Chúng tôi phát hiện tài khoản của bạn có #{user.login_activities.conflicts.count} lần đăng nhập xung đột. " \
+            "Nếu không phải bạn, hãy đổi mật khẩu Google ngay để bảo vệ tài khoản.",
+      notification_type: "warning",
+      created_by: "system"
+    )
+  end
+
   def self.notify_feedback_approved feedback
     return unless feedback.user_id
 

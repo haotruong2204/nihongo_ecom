@@ -67,6 +67,7 @@ Rails.application.routes.draw do
           resources :roadmap_day_progresses, only: [:index], controller: "user_roadmap_day_progresses"
           resources :custom_vocab_items, only: [:index], controller: "user_custom_vocab_items"
           resources :feedbacks, only: [:index], controller: "user_feedbacks"
+          resources :login_activities, only: [:index], controller: "user_login_activities"
           resource :setting, only: [:show], controller: "user_settings"
         end
       end

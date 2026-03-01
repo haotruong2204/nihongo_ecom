@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_02_28_120001) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_01_100001) do
   create_table "admin_notifications", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "title", null: false
     t.text "body"
@@ -119,6 +119,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_28_120001) do
     t.index ["user_id", "level"], name: "index_jlpt_test_results_on_user_id_and_level"
     t.index ["user_id", "taken_at"], name: "index_jlpt_test_results_on_user_id_and_taken_at"
     t.index ["user_id"], name: "index_jlpt_test_results_on_user_id"
+  end
+
+  create_table "login_activities", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "ip_address", limit: 45
+    t.string "user_agent", limit: 500
+    t.string "device_info", limit: 200
+    t.boolean "session_conflict", default: false, null: false
+    t.datetime "created_at", null: false
+    t.index ["user_id", "created_at"], name: "index_login_activities_on_user_id_and_created_at"
+    t.index ["user_id", "session_conflict"], name: "index_login_activities_on_user_id_and_session_conflict"
+    t.index ["user_id"], name: "index_login_activities_on_user_id"
   end
 
   create_table "quick_replies", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
@@ -244,6 +256,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_28_120001) do
   add_foreign_key "feedbacks", "feedbacks", column: "parent_id", on_delete: :cascade
   add_foreign_key "feedbacks", "users"
   add_foreign_key "jlpt_test_results", "users"
+  add_foreign_key "login_activities", "users", on_delete: :cascade
   add_foreign_key "review_logs", "users"
   add_foreign_key "roadmap_day_progresses", "users"
   add_foreign_key "srs_cards", "users"

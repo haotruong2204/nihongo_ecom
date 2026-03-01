@@ -25,7 +25,8 @@ class Api::V1::Admins::UsersController < Api::V1::BaseController
       custom_vocab_items_count: @user.custom_vocab_items.count,
       roadmap_day_progresses_count: @user.roadmap_day_progresses.count,
       tango_lesson_progresses_count: @user.tango_lesson_progresses.count,
-      jlpt_test_results_count: @user.jlpt_test_results.count
+      jlpt_test_results_count: @user.jlpt_test_results.count,
+      login_activities_count: @user.login_activities.count
     }
 
     response_success({
@@ -39,7 +40,16 @@ class Api::V1::Admins::UsersController < Api::V1::BaseController
   end
 
   def update
+    was_banned = @user.is_banned
     if @user.update(user_params)
+      # If admin just banned user → force logout immediately
+      if @user.is_banned && !was_banned
+        ActionCable.server.broadcast("user_notifications_#{@user.id}", {
+          type: "force_logout", reason: "banned"
+        })
+        @user.update!(jti: SecureRandom.uuid)
+      end
+
       response_success({
                          code: 200,
         message: I18n.t("api.common.update_success"),
