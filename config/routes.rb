@@ -48,6 +48,7 @@ Rails.application.routes.draw do
       # Admin management
       namespace :admins do
         get "me", to: "dashboard#me"
+        get "analytics", to: "dashboard#analytics"
         resources :feedbacks, only: [:index, :show, :update, :destroy] do
           resources :replies, only: [:create], controller: "feedback_replies"
         end
