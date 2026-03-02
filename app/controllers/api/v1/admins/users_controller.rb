@@ -51,6 +51,11 @@ class Api::V1::Admins::UsersController < Api::V1::BaseController
         @user.update!(jti: SecureRandom.uuid)
       end
 
+      # If admin just unbanned user → reset conflict count
+      if was_banned && !@user.is_banned
+        @user.login_activities.conflicts.update_all(session_conflict: false)
+      end
+
       response_success({
                          code: 200,
         message: I18n.t("api.common.update_success"),
