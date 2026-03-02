@@ -42,6 +42,7 @@ Rails.application.routes.draw do
         get "chat_status", to: "chat_status#show"
         post "chat_messages", to: "chat_status#record_message"
         resources :quick_replies, only: [:index]
+        resources :page_views, only: [:create]
       end
 
       # Admin management
@@ -60,12 +61,6 @@ Rails.application.routes.draw do
         end
         resources :user_notifications, only: [:index, :show, :create, :update, :destroy]
         resources :quick_replies
-        resources :request_stats, only: [:index] do
-          collection do
-            get "realtime/:user_id", action: :realtime, as: :realtime
-            get :summary
-          end
-        end
         resources :chat_rooms, only: [:index, :update], param: :uid
         resources :users, only: [:index, :show, :update, :destroy] do
           resources :srs_cards, only: [:index], controller: "user_srs_cards"
@@ -74,6 +69,7 @@ Rails.application.routes.draw do
           resources :custom_vocab_items, only: [:index], controller: "user_custom_vocab_items"
           resources :feedbacks, only: [:index], controller: "user_feedbacks"
           resources :login_activities, only: [:index], controller: "user_login_activities"
+          resources :page_views, only: [:index], controller: "user_page_views"
           resource :setting, only: [:show], controller: "user_settings"
         end
       end

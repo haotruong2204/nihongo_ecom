@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_02_110001) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_02_120002) do
   create_table "admin_notifications", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "title", null: false
     t.text "body"
@@ -81,19 +81,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_02_110001) do
     t.index ["user_id"], name: "index_custom_vocab_items_on_user_id"
   end
 
-  create_table "daily_request_stats", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.date "date", null: false
-    t.integer "total_requests", default: 0, null: false
-    t.json "endpoint_stats"
-    t.boolean "flagged", default: false, null: false
-    t.string "flag_reason", limit: 200
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["user_id", "date"], name: "index_daily_request_stats_on_user_id_and_date", unique: true
-    t.index ["user_id"], name: "index_daily_request_stats_on_user_id"
-  end
-
   create_table "feedbacks", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "user_id"
     t.string "email"
@@ -146,6 +133,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_02_110001) do
     t.index ["user_id", "created_at"], name: "index_login_activities_on_user_id_and_created_at"
     t.index ["user_id", "session_conflict"], name: "index_login_activities_on_user_id_and_session_conflict"
     t.index ["user_id"], name: "index_login_activities_on_user_id"
+  end
+
+  create_table "page_views", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "url", limit: 500, null: false
+    t.datetime "visited_at", null: false
+    t.index ["user_id", "visited_at"], name: "index_page_views_on_user_id_and_visited_at"
+    t.index ["user_id"], name: "index_page_views_on_user_id"
+    t.index ["visited_at"], name: "index_page_views_on_visited_at"
   end
 
   create_table "quick_replies", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
@@ -268,11 +264,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_02_110001) do
   add_foreign_key "chat_rooms", "users"
   add_foreign_key "contacts", "users"
   add_foreign_key "custom_vocab_items", "users"
-  add_foreign_key "daily_request_stats", "users", on_delete: :cascade
   add_foreign_key "feedbacks", "feedbacks", column: "parent_id", on_delete: :cascade
   add_foreign_key "feedbacks", "users"
   add_foreign_key "jlpt_test_results", "users"
   add_foreign_key "login_activities", "users", on_delete: :cascade
+  add_foreign_key "page_views", "users", on_delete: :cascade
   add_foreign_key "review_logs", "users"
   add_foreign_key "roadmap_day_progresses", "users"
   add_foreign_key "srs_cards", "users"

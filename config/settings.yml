@@ -1,5 +1,0 @@
-request_tracking:
-  daily_limit: 1000
-  burst_limit: 30
-  redis_key_ttl: 172800  # 48 hours
-  burst_key_ttl: 60      # 1 minute

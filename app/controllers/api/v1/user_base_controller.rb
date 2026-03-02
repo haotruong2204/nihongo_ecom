@@ -5,7 +5,6 @@ class Api::V1::UserBaseController < ApplicationController
   before_action :authenticate_user!
   include CommonResponse
   include ErrorCode
-  include Trackable
 
   respond_to :json
 

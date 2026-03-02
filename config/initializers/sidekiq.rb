@@ -14,12 +14,6 @@ Sidekiq.configure_server do |config|
         "class" => "CleanupNotificationsJob",
         "queue" => "default",
         "description" => "Delete notifications older than 15 days"
-      },
-      "flush_request_stats" => {
-        "cron" => "5 * * * *", # Every hour at minute 05
-        "class" => "FlushRequestStatsJob",
-        "queue" => "default",
-        "description" => "Flush Redis request counters to daily_request_stats table"
       }
     }
 

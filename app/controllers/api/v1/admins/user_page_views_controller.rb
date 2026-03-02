@@ -1,0 +1,37 @@
+# frozen_string_literal: true
+
+class Api::V1::Admins::UserPageViewsController < Api::V1::BaseController
+  include Pagy::Backend
+
+  before_action :set_user
+
+  def index
+    q = @user.page_views.ransack(params[:q])
+    pagy, page_views = pagy(q.result.recent, limit: params[:per_page] || 20)
+
+    response_success({
+                       code: 200,
+      message: I18n.t("api.common.success"),
+      resource: PageViewSerializer.new(page_views).serializable_hash,
+      pagy: pagy_metadata(pagy),
+      status: :ok
+                     })
+  end
+
+  private
+
+  def set_user
+    @user = User.find(params[:user_id])
+  rescue ActiveRecord::RecordNotFound
+    not_found
+  end
+
+  def pagy_metadata pagy
+    {
+      current_page: pagy.page,
+      total_pages: pagy.pages,
+      total_count: pagy.count,
+      per_page: pagy.limit
+    }
+  end
+end

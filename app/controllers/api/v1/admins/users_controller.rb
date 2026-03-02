@@ -26,7 +26,8 @@ class Api::V1::Admins::UsersController < Api::V1::BaseController
       roadmap_day_progresses_count: @user.roadmap_day_progresses.count,
       tango_lesson_progresses_count: @user.tango_lesson_progresses.count,
       jlpt_test_results_count: @user.jlpt_test_results.count,
-      login_activities_count: @user.login_activities.count
+      login_activities_count: @user.login_activities.count,
+      page_views_count: @user.page_views.count
     }
 
     response_success({
