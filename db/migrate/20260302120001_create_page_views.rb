@@ -5,10 +5,10 @@ class CreatePageViews < ActiveRecord::Migration[8.0]
     create_table :page_views do |t|
       t.references :user, null: false, foreign_key: { on_delete: :cascade }
       t.string :url, null: false, limit: 500
-      t.integer :view_count, null: false, default: 1
-      t.datetime :last_visited_at, null: false
+      t.datetime :visited_at, null: false
     end
 
-    add_index :page_views, [:user_id, :url], unique: true
+    add_index :page_views, [:user_id, :visited_at]
+    add_index :page_views, :visited_at
   end
 end

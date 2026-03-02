@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_02_120002) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_02_130001) do
   create_table "admin_notifications", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "title", null: false
     t.text "body"
@@ -138,10 +138,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_02_120002) do
   create_table "page_views", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "url", limit: 500, null: false
-    t.datetime "visited_at", null: false
-    t.index ["user_id", "visited_at"], name: "index_page_views_on_user_id_and_visited_at"
+    t.datetime "last_visited_at", null: false
+    t.integer "view_count", default: 1, null: false
+    t.index ["last_visited_at"], name: "index_page_views_on_last_visited_at"
+    t.index ["user_id", "last_visited_at"], name: "index_page_views_on_user_id_and_last_visited_at"
+    t.index ["user_id", "url"], name: "index_page_views_on_user_id_and_url", unique: true
     t.index ["user_id"], name: "index_page_views_on_user_id"
-    t.index ["visited_at"], name: "index_page_views_on_visited_at"
   end
 
   create_table "quick_replies", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
