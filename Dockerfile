@@ -44,6 +44,9 @@ RUN bundle config set --local deployment 'true' && \
 # Copy application code
 COPY . .
 
+# Create GeoIP directory (DB file mounted via volume)
+RUN mkdir -p db/geoip
+
 # Create a non-root user
 RUN groupadd -r appuser && useradd -r -g appuser appuser
 RUN chown -R appuser:appuser /app

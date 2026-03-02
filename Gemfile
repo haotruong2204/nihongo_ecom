@@ -107,3 +107,6 @@ gem "httparty"
 # background jobs
 gem "sidekiq"
 gem "sidekiq-cron"
+
+# IP geolocation
+gem "maxminddb"

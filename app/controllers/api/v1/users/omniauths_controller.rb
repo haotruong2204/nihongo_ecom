@@ -30,7 +30,8 @@ class Api::V1::Users::OmniauthsController < Api::V1::UserBaseController
       ip_address: request.remote_ip,
       user_agent: request.user_agent&.truncate(500),
       device_info: parse_device_info(request.user_agent),
-      session_conflict: !is_new_user
+      session_conflict: !is_new_user,
+      **geoip_attrs(request.remote_ip)
     )
 
     # Check conflict escalation
@@ -85,5 +86,12 @@ class Api::V1::Users::OmniauthsController < Api::V1::UserBaseController
          end
 
     "#{browser} / #{os}"
+  end
+
+  def geoip_attrs(ip)
+    geo = GeoipLookupService.lookup(ip)
+    return {} unless geo
+
+    { country: geo[:country], city: geo[:city] }
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_01_100001) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_02_100002) do
   create_table "admin_notifications", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "title", null: false
     t.text "body"
@@ -128,6 +128,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_01_100001) do
     t.string "device_info", limit: 200
     t.boolean "session_conflict", default: false, null: false
     t.datetime "created_at", null: false
+    t.string "country", limit: 100
+    t.string "city", limit: 100
     t.index ["user_id", "created_at"], name: "index_login_activities_on_user_id_and_created_at"
     t.index ["user_id", "session_conflict"], name: "index_login_activities_on_user_id_and_session_conflict"
     t.index ["user_id"], name: "index_login_activities_on_user_id"

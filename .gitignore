@@ -43,3 +43,6 @@ coverage
 # RSA key files (private keys only — public key is safe to commit)
 *.pem
 !/config/rsa_public.pem
+
+# MaxMind GeoIP database
+*.mmdb

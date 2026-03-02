@@ -15,6 +15,7 @@ services:
     volumes:
       - app_storage:/app/storage
       - app_log:/app/log
+      - geoip_data:/app/db/geoip
     depends_on:
       db:
         condition: service_healthy
@@ -91,6 +92,8 @@ services:
     container_name: nihongo_sidekiq
     command: bundle exec sidekiq -c 2
     env_file: .env.production
+    volumes:
+      - geoip_data:/app/db/geoip
     depends_on:
       db:
         condition: service_healthy
@@ -127,6 +130,7 @@ volumes:
   mysql_data:
   app_storage:
   app_log:
+  geoip_data:
 
 networks:
   app_network:

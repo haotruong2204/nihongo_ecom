@@ -202,6 +202,7 @@ GEM
       net-pop
       net-smtp
     marcel (1.0.4)
+    maxminddb (0.1.22)
     method_source (1.1.0)
     mini_mime (1.1.5)
     mini_portile2 (2.8.9)
@@ -498,6 +499,7 @@ DEPENDENCIES
   httparty
   jsonapi-serializer
   kamal
+  maxminddb
   mysql2 (~> 0.5)
   oauth
   pagy
