@@ -9,8 +9,11 @@ module Trackable
 
   private
 
+  EXCLUDED_PATHS = %w[/api/v1/users/notifications].freeze
+
   def track_request
     return unless current_user
+    return if EXCLUDED_PATHS.include?(request.path)
 
     user_id = current_user.id
     date = Date.current.to_s

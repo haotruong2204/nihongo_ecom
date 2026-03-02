@@ -38,11 +38,11 @@ class Api::V1::Users::OmniauthsController < Api::V1::UserBaseController
     if !is_new_user
       conflict_count = user.login_activities.conflicts.count
 
-      if conflict_count >= 11 && !user.banned?
-        # Auto-ban at 11th conflict
+      if conflict_count >= 21 && !user.banned?
+        # Auto-ban at 21st conflict
         user.update!(is_banned: true, banned_reason: "Tự động khóa: chia sẻ tài khoản (#{conflict_count} lần xung đột)")
-      elsif (conflict_count % 10).zero?
-        # Warn at every 10 conflicts
+      elsif (conflict_count % 20).zero?
+        # Warn at every 20 conflicts
         UserNotification.notify_session_conflict_warning(user)
       end
     end
