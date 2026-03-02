@@ -3,6 +3,7 @@
 class Api::V1::UserBaseController < ApplicationController
   include Pagy::Backend
   before_action :authenticate_user!
+  after_action :track_request_rate
   include CommonResponse
   include ErrorCode
 
@@ -26,6 +27,31 @@ class Api::V1::UserBaseController < ApplicationController
   attr_reader :current_user
 
   private
+
+  REQUEST_LIMIT = 500
+  REQUEST_PERIOD = 1.hour
+
+  def track_request_rate
+    return unless current_user
+
+    redis = Redis.new(url: ENV.fetch("REDIS_URL", "redis://localhost:6379"))
+    key = "user_req_count:#{current_user.id}"
+
+    count = redis.incr(key)
+    redis.expire(key, REQUEST_PERIOD.to_i) if count == 1
+
+    if count == REQUEST_LIMIT
+      AdminNotification.create(
+        title: "Cảnh báo: #{current_user.email} đã gửi #{REQUEST_LIMIT} request/giờ",
+        body: "User ##{current_user.id} (#{current_user.email}) đã đạt #{REQUEST_LIMIT} requests trong 1 giờ. Có thể là hành vi bất thường.",
+        link: "/users/#{current_user.id}",
+        notification_type: "abuse_alert",
+        created_by: "system"
+      )
+    end
+  rescue Redis::BaseError => e
+    Rails.logger.error("[TrackRequestRate] Redis error: #{e.message}")
+  end
 
   def pagy_metadata pagy
     {
