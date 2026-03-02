@@ -18,3 +18,4 @@ en:
       need_password_change: You need to change your password first before continue
       some_references_not_found: Some references not found
       session_has_expired: Login session has expired!
+      too_many_requests: Too many requests. Please slow down.

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_02_100002) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_02_110001) do
   create_table "admin_notifications", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "title", null: false
     t.text "body"
@@ -79,6 +79,19 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_02_100002) do
     t.index ["user_id", "position"], name: "index_custom_vocab_items_on_user_id_and_position"
     t.index ["user_id", "word"], name: "index_custom_vocab_items_on_user_id_and_word", unique: true
     t.index ["user_id"], name: "index_custom_vocab_items_on_user_id"
+  end
+
+  create_table "daily_request_stats", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.date "date", null: false
+    t.integer "total_requests", default: 0, null: false
+    t.json "endpoint_stats"
+    t.boolean "flagged", default: false, null: false
+    t.string "flag_reason", limit: 200
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "date"], name: "index_daily_request_stats_on_user_id_and_date", unique: true
+    t.index ["user_id"], name: "index_daily_request_stats_on_user_id"
   end
 
   create_table "feedbacks", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
@@ -255,6 +268,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_02_100002) do
   add_foreign_key "chat_rooms", "users"
   add_foreign_key "contacts", "users"
   add_foreign_key "custom_vocab_items", "users"
+  add_foreign_key "daily_request_stats", "users", on_delete: :cascade
   add_foreign_key "feedbacks", "feedbacks", column: "parent_id", on_delete: :cascade
   add_foreign_key "feedbacks", "users"
   add_foreign_key "jlpt_test_results", "users"

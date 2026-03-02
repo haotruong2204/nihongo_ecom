@@ -29,6 +29,10 @@ module CommonResponse
     response_error({}, UNAUTHORIZED, message)
   end
 
+  def too_many_requests message = I18n.t("api.error.too_many_requests")
+    response_error({}, TOO_MANY_REQUESTS, message)
+  end
+
   private
 
   def render_response success, code, message, data

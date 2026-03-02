@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class AdminNotification < ApplicationRecord
-  NOTIFICATION_TYPES = %w[feedback new_feature upgrade_success maintenance welcome warning].freeze
+  NOTIFICATION_TYPES = %w[feedback new_feature upgrade_success maintenance welcome warning abuse_alert].freeze
   CREATED_BY_OPTIONS = %w[system admin].freeze
 
   scope :unread, -> { where(read: false) }

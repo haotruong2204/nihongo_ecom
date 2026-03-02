@@ -60,6 +60,12 @@ Rails.application.routes.draw do
         end
         resources :user_notifications, only: [:index, :show, :create, :update, :destroy]
         resources :quick_replies
+        resources :request_stats, only: [:index] do
+          collection do
+            get "realtime/:user_id", action: :realtime, as: :realtime
+            get :summary
+          end
+        end
         resources :chat_rooms, only: [:index, :update], param: :uid
         resources :users, only: [:index, :show, :update, :destroy] do
           resources :srs_cards, only: [:index], controller: "user_srs_cards"
