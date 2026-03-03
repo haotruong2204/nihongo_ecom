@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Api::V1::Admins::DashboardController < Api::V1::BaseController
+  include OnlinePresence
+
   def me
     response_success({
                        code: 200,
@@ -19,6 +21,9 @@ class Api::V1::Admins::DashboardController < Api::V1::BaseController
                  CacheDashboardStatsJob.perform_now
                  JSON.parse(REDIS.get(CacheDashboardStatsJob::CACHE_KEY))
                end
+
+    resource["widgets"] ||= {}
+    resource["widgets"]["online_users"] = online_users_count
 
     response_success({
                        code: 200,
