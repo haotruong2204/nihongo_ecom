@@ -13,10 +13,15 @@ class Api::V1::Users::OmniauthsController < Api::V1::UserBaseController
 
     user = User.create_user_for_google(user_data)
 
-    is_new_user = user.login_activities.none?
+    last_login = user.login_activities.order(created_at: :desc).first
+    current_device = parse_device_info(request.user_agent)
+    current_ip = request.remote_ip
+
+    is_conflict = last_login.present? &&
+      (last_login.device_info != current_device || last_login.ip_address != current_ip)
 
     # Broadcast force_logout to existing sessions BEFORE regenerating jti
-    unless is_new_user
+    if is_conflict
       ActionCable.server.broadcast("user_notifications_#{user.id}", {
         type: "force_logout", reason: "new_login"
       })
@@ -27,22 +32,20 @@ class Api::V1::Users::OmniauthsController < Api::V1::UserBaseController
 
     # Log login activity
     user.login_activities.create!(
-      ip_address: request.remote_ip,
+      ip_address: current_ip,
       user_agent: request.user_agent&.truncate(500),
-      device_info: parse_device_info(request.user_agent),
-      session_conflict: !is_new_user,
-      **geoip_attrs(request.remote_ip)
+      device_info: current_device,
+      session_conflict: is_conflict,
+      **geoip_attrs(current_ip)
     )
 
     # Check conflict escalation
-    if !is_new_user
+    if is_conflict
       conflict_count = user.login_activities.conflicts.count
 
       if conflict_count >= 21 && !user.banned?
-        # Auto-ban at 21st conflict
         user.update!(is_banned: true, banned_reason: "Tự động khóa: chia sẻ tài khoản (#{conflict_count} lần xung đột)")
       elsif (conflict_count % 20).zero?
-        # Warn at every 20 conflicts
         UserNotification.notify_session_conflict_warning(user)
       end
     end
