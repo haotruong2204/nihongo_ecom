@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class PageView < ApplicationRecord
-  belongs_to :user
+  belongs_to :user, counter_cache: true
 
   scope :recent, -> { order(last_visited_at: :desc) }
 
