@@ -5,6 +5,7 @@ class Feedback < ApplicationRecord
   belongs_to :parent, class_name: "Feedback", optional: true
   has_many :replies, class_name: "Feedback", foreign_key: :parent_id, dependent: :destroy
   has_many :displayed_replies, -> { where(display: true) }, class_name: "Feedback", foreign_key: :parent_id
+  has_many :user_notifications, dependent: :destroy
 
   enum :status, { pending: 0, reviewed: 1, done: 2, rejected: 3 }
 

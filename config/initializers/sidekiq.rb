@@ -14,6 +14,12 @@ Sidekiq.configure_server do |config|
         "class" => "CleanupNotificationsJob",
         "queue" => "default",
         "description" => "Delete notifications older than 15 days"
+      },
+      "cache_dashboard_stats" => {
+        "cron" => "*/10 * * * *", # Every 10 minutes
+        "class" => "CacheDashboardStatsJob",
+        "queue" => "default",
+        "description" => "Pre-compute and cache dashboard statistics in Redis"
       }
     }
 

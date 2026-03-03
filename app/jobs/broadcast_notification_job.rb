@@ -3,18 +3,21 @@
 class BroadcastNotificationJob < ApplicationJob
   queue_as :default
 
-  def perform(notification_id, event_type)
-    notification = UserNotification.find_by(id: notification_id)
-    return unless notification
-
+  def perform(notification_id, event_type, metadata = {})
     case event_type
     when "created"
+      notification = UserNotification.find_by(id: notification_id)
+      return unless notification
+
       ActionCable.server.broadcast("user_notifications_#{notification.user_id}", {
         type: "new_notification",
         notification: UserNotificationSerializer.new(notification).serializable_hash[:data]
       })
     when "destroyed"
-      ActionCable.server.broadcast("user_notifications_#{notification.user_id}", {
+      user_id = metadata[:user_id] || metadata["user_id"]
+      return unless user_id
+
+      ActionCable.server.broadcast("user_notifications_#{user_id}", {
         type: "delete_notification",
         notification_id: notification_id
       })

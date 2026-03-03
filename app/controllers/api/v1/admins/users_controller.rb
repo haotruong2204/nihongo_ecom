@@ -19,23 +19,35 @@ class Api::V1::Admins::UsersController < Api::V1::BaseController
   end
 
   def show
-    stats = {
-      srs_cards_count: @user.srs_cards.count,
-      review_logs_count: @user.review_logs.count,
-      custom_vocab_items_count: @user.custom_vocab_items.count,
-      roadmap_day_progresses_count: @user.roadmap_day_progresses.count,
-      tango_lesson_progresses_count: @user.tango_lesson_progresses.count,
-      jlpt_test_results_count: @user.jlpt_test_results.count,
-      login_activities_count: @user.login_activities.count,
-      page_views_count: @user.page_views.count
-    }
+    cache_key = "user_stats:#{@user.id}"
+    cached = REDIS.get(cache_key)
+
+    if cached
+      parsed = JSON.parse(cached)
+      stats = parsed["stats"]
+      learning_summary = parsed["learning_summary"]
+    else
+      stats = {
+        srs_cards_count: @user.srs_cards.count,
+        review_logs_count: @user.review_logs.count,
+        custom_vocab_items_count: @user.custom_vocab_items.count,
+        roadmap_day_progresses_count: @user.roadmap_day_progresses.count,
+        tango_lesson_progresses_count: @user.tango_lesson_progresses.count,
+        jlpt_test_results_count: @user.jlpt_test_results.count,
+        login_activities_count: @user.login_activities.count,
+        page_views_count: @user.page_views.count
+      }
+      learning_summary = build_learning_summary
+
+      REDIS.setex(cache_key, 5.minutes.to_i, { stats: stats, learning_summary: learning_summary }.to_json)
+    end
 
     response_success({
                        code: 200,
       message: I18n.t("api.common.success"),
       resource: UserSerializer.new(@user).serializable_hash,
       stats: stats,
-      learning_summary: build_learning_summary,
+      learning_summary: learning_summary,
       status: :ok
                      })
   end
