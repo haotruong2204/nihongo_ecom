@@ -16,7 +16,7 @@ class Feedback < ApplicationRecord
 
   after_create_commit { BroadcastFeedbackJob.perform_later(id, "created") }
   after_update_commit { BroadcastFeedbackJob.perform_later(id, "updated") }
-  after_destroy_commit { BroadcastFeedbackJob.perform_later(id, "destroyed") }
+  after_destroy_commit { BroadcastFeedbackJob.perform_later(id, "destroyed", parent_id: parent_id, user_id: user_id) }
 
   def self.ransackable_attributes _auth_object = nil
     %w[status email display created_at context_type context_id parent_id]

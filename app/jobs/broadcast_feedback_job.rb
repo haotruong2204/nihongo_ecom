@@ -3,7 +3,12 @@
 class BroadcastFeedbackJob < ApplicationJob
   queue_as :default
 
-  def perform(feedback_id, event_type)
+  def perform(feedback_id, event_type, metadata = {})
+    if event_type == "destroyed"
+      broadcast_destroyed(feedback_id, metadata)
+      return
+    end
+
     feedback = Feedback.find_by(id: feedback_id)
     return unless feedback
 
@@ -23,14 +28,31 @@ class BroadcastFeedbackJob < ApplicationJob
       payload = { type: "feedback_updated", feedback: serialize_feedback(root) }
       ActionCable.server.broadcast("admin_feedbacks", payload)
       ActionCable.server.broadcast("user_feedbacks_#{root.user_id}", payload) if root.user_id
-    when "destroyed"
-      payload = { type: "feedback_deleted", feedback_id: feedback_id, parent_id: feedback.parent_id }
-      ActionCable.server.broadcast("admin_feedbacks", payload)
-      ActionCable.server.broadcast("user_feedbacks_#{root.user_id}", payload) if root.user_id
     end
   end
 
   private
+
+  def broadcast_destroyed(feedback_id, metadata)
+    parent_id = metadata[:parent_id] || metadata["parent_id"]
+    user_id = metadata[:user_id] || metadata["user_id"]
+
+    # Nếu xóa reply → tìm root để broadcast updated state
+    if parent_id
+      root = Feedback.find_by(id: parent_id)
+      if root
+        payload = { type: "feedback_updated", feedback: serialize_feedback(root) }
+        ActionCable.server.broadcast("admin_feedbacks", payload)
+        ActionCable.server.broadcast("user_feedbacks_#{root.user_id}", payload) if root.user_id
+        return
+      end
+    end
+
+    # Xóa root feedback
+    payload = { type: "feedback_deleted", feedback_id: feedback_id, parent_id: parent_id }
+    ActionCable.server.broadcast("admin_feedbacks", payload)
+    ActionCable.server.broadcast("user_feedbacks_#{user_id}", payload) if user_id
+  end
 
   def serialize_feedback(feedback)
     FeedbackSerializer.new(feedback, include: [:replies]).serializable_hash[:data]
