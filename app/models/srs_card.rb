@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class SrsCard < ApplicationRecord
-  belongs_to :user
+  belongs_to :user, counter_cache: true
 
   enum :state, { new_card: 0, learning: 1, review: 2, relearning: 3 }
 

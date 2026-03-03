@@ -7,7 +7,8 @@ class Api::V1::Admins::UsersController < Api::V1::BaseController
 
   def index
     q = User.ransack(params[:q])
-    pagy, users = pagy(q.result.order(created_at: :desc), limit: params[:per_page] || 20)
+    results = q.sorts.empty? ? q.result.order(created_at: :desc) : q.result
+    pagy, users = pagy(results, limit: params[:per_page] || 20)
 
     response_success({
                        code: 200,

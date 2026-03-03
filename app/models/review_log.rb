@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ReviewLog < ApplicationRecord
-  belongs_to :user
+  belongs_to :user, counter_cache: true
 
   enum :rating, { again: 1, hard: 2, good: 3, easy: 4 }
 

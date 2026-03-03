@@ -69,6 +69,17 @@ class UserNotification < ApplicationRecord
     )
   end
 
+  def self.notify_learning_too_fast user
+    create(
+      user_id: user.id,
+      title: "Bạn đang học quá nhanh!",
+      body: "Chúng tôi nhận thấy bạn đang gửi rất nhiều yêu cầu trong thời gian ngắn. " \
+            "Hãy điều chỉnh tốc độ để dễ dàng tiếp thu kiến thức hơn nhé!",
+      notification_type: "warning",
+      created_by: "system"
+    )
+  end
+
   def self.notify_feedback_approved feedback
     return unless feedback.user_id
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_02_130001) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_03_100001) do
   create_table "admin_notifications", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "title", null: false
     t.text "body"
@@ -258,6 +258,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_02_130001) do
     t.datetime "updated_at", null: false
     t.boolean "is_banned", default: false, null: false
     t.string "banned_reason", limit: 500
+    t.integer "srs_cards_count", default: 0, null: false
+    t.integer "review_logs_count", default: 0, null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["jti"], name: "index_users_on_jti", unique: true
     t.index ["uid"], name: "index_users_on_uid", unique: true
