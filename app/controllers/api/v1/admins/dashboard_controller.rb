@@ -18,6 +18,7 @@ class Api::V1::Admins::DashboardController < Api::V1::BaseController
                        message: I18n.t("api.common.success"),
                        resource: {
                          widgets: build_widgets(today),
+                         record_stats: build_record_stats(today),
                          daily_activity: build_daily_activity,
                          srs_distribution: build_srs_distribution,
                          top_pages: build_top_pages,
@@ -36,9 +37,24 @@ class Api::V1::Admins::DashboardController < Api::V1::BaseController
     {
       total_users: User.count,
       premium_users: User.where(is_premium: true).count,
-      reviews_today: ReviewLog.where("reviewed_at >= ?", today).count,
-      pending_feedbacks: Feedback.roots.where(status: :pending).count
+      new_users_today: User.where("created_at >= ?", today).count,
+      logged_in_users: LoginActivity.where("created_at >= ?", today).select(:user_id).distinct.count
     }
+  end
+
+  def build_record_stats(today)
+    tables = [ReviewLog, LoginActivity, SrsCard, Feedback,
+              RoadmapDayProgress, TangoLessonProgress, JlptTestResult,
+              CustomVocabItem, Contact]
+
+    records_today = tables.sum { |t| t.where("created_at >= ?", today).count }
+    records_today += PageView.where("last_visited_at >= ?", today).count
+    total_records = tables.sum(&:count) + PageView.count
+
+    redis = Redis.new(url: ENV.fetch("REDIS_URL", "redis://localhost:6379"))
+    requests_today = redis.get("daily_req_count:#{Date.today}").to_i
+
+    { records_today:, total_records:, requests_today: }
   end
 
   def build_daily_activity

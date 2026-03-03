@@ -40,6 +40,10 @@ class Api::V1::UserBaseController < ApplicationController
     count = redis.incr(key)
     redis.expire(key, REQUEST_PERIOD.to_i) if count == 1
 
+    daily_key = "daily_req_count:#{Date.today}"
+    redis.incr(daily_key)
+    redis.expire(daily_key, 48.hours.to_i) if redis.ttl(daily_key) < 0
+
     if count == REQUEST_LIMIT
       AdminNotification.create(
         title: "Cảnh báo: #{current_user.email} đã gửi #{REQUEST_LIMIT} request/giờ",
