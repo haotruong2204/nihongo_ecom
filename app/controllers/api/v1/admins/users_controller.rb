@@ -57,11 +57,8 @@ class Api::V1::Admins::UsersController < Api::V1::BaseController
   def update
     was_banned = @user.is_banned
     if @user.update(user_params)
-      # If admin just banned user → force logout immediately
+      # If admin just banned user → invalidate JWT to force logout on next request
       if @user.is_banned && !was_banned
-        ActionCable.server.broadcast("user_notifications_#{@user.id}", {
-          type: "force_logout", reason: "banned"
-        })
         @user.update!(jti: SecureRandom.uuid)
       end
 

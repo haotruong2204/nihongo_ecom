@@ -20,12 +20,7 @@ class Api::V1::Users::OmniauthsController < Api::V1::UserBaseController
     is_conflict = last_login.present? &&
                   (last_login.device_info != current_device || last_login.ip_address != current_ip)
 
-    # Broadcast force_logout to existing sessions BEFORE regenerating jti
-    if is_conflict
-      ActionCable.server.broadcast("user_notifications_#{user.id}", { type: "force_logout", reason: "new_login" })
-    end
-
-    # Regenerate jti → invalidate all old tokens
+    # Regenerate jti → invalidate all old tokens (existing sessions will fail on next API call)
     user.update!(jti: SecureRandom.uuid)
 
     # Log login activity

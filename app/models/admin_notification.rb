@@ -7,8 +7,6 @@ class AdminNotification < ApplicationRecord
   scope :unread, -> { where(read: false) }
   scope :recent, -> { order(created_at: :desc) }
 
-  after_create_commit :broadcast_to_admins
-
   validates :title, presence: true
   validates :notification_type, inclusion: { in: NOTIFICATION_TYPES }
   validates :created_by, inclusion: { in: CREATED_BY_OPTIONS }
@@ -30,12 +28,4 @@ class AdminNotification < ApplicationRecord
     )
   end
 
-  private
-
-  def broadcast_to_admins
-    ActionCable.server.broadcast("admin_notifications", {
-                                   type: "new_notification",
-      notification: AdminNotificationSerializer.new(self).serializable_hash[:data]
-                                 })
-  end
 end
