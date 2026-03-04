@@ -23,6 +23,11 @@ Sidekiq.configure_server do |config|
       }
     }
 
+    # Xóa các cron jobs cũ không còn trong schedule
+    Sidekiq::Cron::Job.all.each do |job|
+      job.destroy unless schedule.key?(job.name)
+    end
+
     Sidekiq::Cron::Job.load_from_hash!(schedule)
   end
 end
