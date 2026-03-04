@@ -26,7 +26,7 @@ class UserNotification < ApplicationRecord
     create(
       user_id: user.id,
       title: "Chào mừng đến với website!",
-      body: "Cảm ơn bạn đã đăng ký. Chúc bạn học tiếng Nhật vui vẻ!",
+      body: "Cảm ơn bạn đã đăng ký. Chúc bạn học tốt tiếng Nhật!",
       notification_type: "welcome",
       created_by: "system"
     )
@@ -59,7 +59,7 @@ class UserNotification < ApplicationRecord
     create(
       user_id: user.id,
       title: "Cảnh báo: Tài khoản của bạn đang được sử dụng ở nhiều nơi",
-      body: "Chúng tôi phát hiện tài khoản của bạn có #{user.login_activities.conflicts.count} lần đăng nhập xung đột. " \
+      body: "Chúng tôi phát hiện tài khoản của bạn có #{user.login_activities.conflicts.count} lần đăng nhập ở nơi khác. " \
             "Nếu không phải bạn, hãy đổi mật khẩu Google ngay để bảo vệ tài khoản.",
       notification_type: "warning",
       created_by: "system"
@@ -70,8 +70,8 @@ class UserNotification < ApplicationRecord
     create(
       user_id: user.id,
       title: "Bạn đang học quá nhanh!",
-      body: "Chúng tôi nhận thấy bạn đang gửi rất nhiều yêu cầu trong thời gian ngắn. " \
-            "Hãy điều chỉnh tốc độ để dễ dàng tiếp thu kiến thức hơn nhé!",
+      body: "Hệ thống phát hiện bạn đang có dấu hiệu của việc spam. " \
+            "Nếu chỉ là đang học nhanh quá, hãy điều chỉnh 1 chút nhé!",
       notification_type: "warning",
       created_by: "system"
     )
