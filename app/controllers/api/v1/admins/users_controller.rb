@@ -2,18 +2,12 @@
 
 class Api::V1::Admins::UsersController < Api::V1::BaseController
   include Pagy::Backend
-  include OnlinePresence
 
   before_action :set_user, only: [:show, :update, :destroy]
 
   def index
     q = User.ransack(params[:q])
     results = q.sorts.empty? ? q.result.order(created_at: :desc) : q.result
-
-    if params[:online].present?
-      ids = online_user_ids
-      results = params[:online] == "true" ? results.where(id: ids) : results.where.not(id: ids)
-    end
 
     pagy, users = pagy(results, limit: params[:per_page] || 20)
 
@@ -22,7 +16,6 @@ class Api::V1::Admins::UsersController < Api::V1::BaseController
       message: I18n.t("api.common.success"),
       resource: UserSerializer.new(users).serializable_hash,
       pagy: pagy_metadata(pagy),
-      online_count: online_users_count,
       status: :ok
                      })
   end
