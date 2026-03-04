@@ -3,6 +3,8 @@
 class CacheDashboardStatsJob < ApplicationJob
   queue_as :default
 
+  sidekiq_options retry: 1
+
   CACHE_KEY = "dashboard_stats"
   CACHE_TTL = 15.minutes.to_i
 
@@ -24,6 +26,10 @@ class CacheDashboardStatsJob < ApplicationJob
     REDIS.setex(CACHE_KEY, CACHE_TTL, stats.to_json)
 
     Rails.logger.info("[CacheDashboardStatsJob] Cached dashboard stats successfully")
+  rescue Redis::BaseError => e
+    Rails.logger.error("[CacheDashboardStatsJob] Redis error: #{e.message}")
+  rescue ActiveRecord::StatementInvalid => e
+    Rails.logger.error("[CacheDashboardStatsJob] DB error: #{e.message}")
   end
 
   private

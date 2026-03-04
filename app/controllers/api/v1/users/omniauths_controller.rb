@@ -3,7 +3,7 @@
 class Api::V1::Users::OmniauthsController < Api::V1::UserBaseController
   skip_before_action :authenticate_user!, only: [:auth_google]
 
-  def auth_google
+  def auth_google # rubocop:disable Metrics/MethodLength,Metrics/PerceivedComplexity
     code = params[:code]
     return bad_request(I18n.t("api.error.bad_request")) unless code.present?
 
@@ -18,13 +18,11 @@ class Api::V1::Users::OmniauthsController < Api::V1::UserBaseController
     current_ip = request.remote_ip
 
     is_conflict = last_login.present? &&
-      (last_login.device_info != current_device || last_login.ip_address != current_ip)
+                  (last_login.device_info != current_device || last_login.ip_address != current_ip)
 
     # Broadcast force_logout to existing sessions BEFORE regenerating jti
     if is_conflict
-      ActionCable.server.broadcast("user_notifications_#{user.id}", {
-        type: "force_logout", reason: "new_login"
-      })
+      ActionCable.server.broadcast("user_notifications_#{user.id}", { type: "force_logout", reason: "new_login" })
     end
 
     # Regenerate jti → invalidate all old tokens
@@ -67,7 +65,7 @@ class Api::V1::Users::OmniauthsController < Api::V1::UserBaseController
 
   private
 
-  def parse_device_info(ua)
+  def parse_device_info ua
     return "Unknown" if ua.blank?
 
     browser = case ua
@@ -91,7 +89,7 @@ class Api::V1::Users::OmniauthsController < Api::V1::UserBaseController
     "#{browser} / #{os}"
   end
 
-  def geoip_attrs(ip)
+  def geoip_attrs ip
     geo = GeoipLookupService.lookup(ip)
     return {} unless geo
 
