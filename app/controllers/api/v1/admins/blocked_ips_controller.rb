@@ -56,26 +56,34 @@ class Api::V1::Admins::BlockedIpsController < Api::V1::BaseController
   private
 
   def ban_associated_users(ip_address)
-    log = DevtoolsLog.find_by(ip_address: ip_address)
-    return [] unless log&.user_id
+    logs = DevtoolsLog.where(ip_address: ip_address).where.not(user_id: nil).includes(:user)
+    banned = []
 
-    user = log.user
-    return [] if user.nil? || user.banned?
+    logs.each do |log|
+      user = log.user
+      next if user.nil? || user.banned?
 
-    user.update!(is_banned: true, banned_reason: "IP #{ip_address} blocked (DevTools)")
-    user.update!(jti: SecureRandom.uuid) # Invalidate all sessions
-    [user.email]
+      user.update!(is_banned: true, banned_reason: "IP #{ip_address} blocked (DevTools)")
+      user.update!(jti: SecureRandom.uuid)
+      banned << user.email
+    end
+
+    banned
   end
 
   def unban_associated_users(ip_address)
-    log = DevtoolsLog.find_by(ip_address: ip_address)
-    return [] unless log&.user_id
+    logs = DevtoolsLog.where(ip_address: ip_address).where.not(user_id: nil).includes(:user)
+    unbanned = []
 
-    user = log.user
-    return [] if user.nil? || !user.banned?
+    logs.each do |log|
+      user = log.user
+      next if user.nil? || !user.banned?
 
-    user.update!(is_banned: false, banned_reason: nil)
-    [user.email]
+      user.update!(is_banned: false, banned_reason: nil)
+      unbanned << user.email
+    end
+
+    unbanned
   end
 
   def blocked_ip_params

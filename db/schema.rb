@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_05_120001) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_05_130001) do
   create_table "admin_notifications", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "title", null: false
     t.text "body"
@@ -100,7 +100,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_05_120001) do
     t.datetime "created_at", null: false
     t.string "country", limit: 100
     t.string "city", limit: 100
-    t.index ["ip_address"], name: "index_devtools_logs_on_ip_address"
+    t.index ["ip_address", "user_id"], name: "idx_devtools_logs_ip_user", unique: true
+    t.index ["ip_address"], name: "idx_devtools_logs_ip"
     t.index ["last_detected_at"], name: "index_devtools_logs_on_last_detected_at"
     t.index ["user_id"], name: "index_devtools_logs_on_user_id"
   end

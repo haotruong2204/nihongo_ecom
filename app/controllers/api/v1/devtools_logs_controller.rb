@@ -10,17 +10,18 @@ class Api::V1::DevtoolsLogsController < ApplicationController
     ip = request.remote_ip
     user = try_authenticate
 
-    log = DevtoolsLog.find_or_initialize_by(ip_address: ip)
+    # Track by IP + user combo: same IP with different users = separate records
+    log = if user
+            DevtoolsLog.find_or_initialize_by(ip_address: ip, user_id: user.id)
+          else
+            DevtoolsLog.find_or_initialize_by(ip_address: ip, user_id: nil)
+          end
 
-    if log.persisted?
-      log.open_count += 1
-    end
-
+    log.open_count += 1 if log.persisted?
     log.user_agent = request.user_agent&.truncate(500)
     log.last_detected_at = Time.current
 
     if user
-      log.user = user
       log.email = user.email
     end
 

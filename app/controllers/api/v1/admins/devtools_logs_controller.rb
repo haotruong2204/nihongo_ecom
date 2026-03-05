@@ -5,7 +5,7 @@ class Api::V1::Admins::DevtoolsLogsController < Api::V1::BaseController
 
   def index
     q = DevtoolsLog.ransack(params[:q])
-    pagy, logs = pagy(q.result.recent, limit: params[:per_page] || 20)
+    pagy, logs = pagy(q.result.recent.includes(:user), limit: params[:per_page] || 20)
 
     response_success({
                        code: 200,
