@@ -25,8 +25,9 @@ module CommonResponse
     response_error({}, NOT_FOUND, message)
   end
 
-  def unauthorized message = I18n.t("api.error.unauthorized")
-    response_error({}, UNAUTHORIZED, message)
+  def unauthorized reason = nil, message = I18n.t("api.error.unauthorized")
+    data = reason ? { reason: reason } : {}
+    response_error(data, UNAUTHORIZED, message)
   end
 
   def too_many_requests message = I18n.t("api.error.too_many_requests")

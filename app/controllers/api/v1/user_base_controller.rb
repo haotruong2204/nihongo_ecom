@@ -11,16 +11,18 @@ class Api::V1::UserBaseController < ApplicationController
 
   def authenticate_user!
     token = request.headers["Authorization"].to_s.split.last
-    return unauthorized unless token
+    return unauthorized("token_missing") unless token
 
     begin
       payload = JWT.decode(token, ENV.fetch("DEVISE_JWT_SECRET_KEY", nil), true, algorithm: "HS256").first
       user = User.find(payload["sub"])
-      return unauthorized unless user.jti == payload["jti"]
+      return unauthorized("device_conflict") unless user.jti == payload["jti"]
 
       @current_user = user
-    rescue JWT::DecodeError, JWT::ExpiredSignature, JWT::VerificationError, ActiveRecord::RecordNotFound
-      unauthorized
+    rescue JWT::ExpiredSignature
+      unauthorized("token_expired")
+    rescue JWT::DecodeError, JWT::VerificationError, ActiveRecord::RecordNotFound
+      unauthorized("token_invalid")
     end
   end
 
