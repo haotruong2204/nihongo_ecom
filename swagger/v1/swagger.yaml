@@ -342,6 +342,38 @@ components:
         updated_at:
           type: string
           format: date-time
+    LeaderboardUser:
+      type: object
+      properties:
+        rank:
+          type: integer
+          example: 1
+        uid:
+          type: string
+          example: google_abc123
+        displayName:
+          type: string
+          example: Nguyen Van A
+        photoURL:
+          type: string
+          nullable: true
+          example: https://lh3.googleusercontent.com/a/xxxxx
+        totalReviews:
+          type: integer
+          description: Tong so luot on tap SRS
+          example: 5420
+        srsCards:
+          type: integer
+          description: Tong so the ghi nho da tao
+          example: 850
+        roadmapDays:
+          type: integer
+          description: So ngay lo trinh da hoan thanh
+          example: 120
+        streakDays:
+          type: integer
+          description: Chuoi ngay lien tiep co on tap (tinh tu hom nay/hom qua)
+          example: 45
 paths:
   "/api/v1/admins/sign_in":
     post:
@@ -3891,6 +3923,49 @@ paths:
                                   $ref: "#/components/schemas/QuickReply"
         "401":
           description: Unauthorized
+
+  "/api/v1/leaderboard":
+    get:
+      tags:
+        - Public
+      summary: Leaderboard - Top 10 nguoi hoc nhieu nhat
+      description: >
+        Tra ve top 10 nguoi dung xep theo tong so luot on tap (totalReviews).
+        Du lieu duoc cache trong Redis 10 phut, khong can dang nhap.
+      security: []
+      responses:
+        "200":
+          description: Thanh cong
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Success
+                  data:
+                    type: object
+                    properties:
+                      code:
+                        type: integer
+                        example: 200
+                      message:
+                        type: string
+                        example: Success
+                      users:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/LeaderboardUser"
+                      status:
+                        type: string
+                        example: ok
 
 security:
   - BearerAuth: []
