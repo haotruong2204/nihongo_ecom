@@ -47,6 +47,16 @@ class Rack::Attack
 
   ### Blocklist ###
 
+  # Block IPs from admin blocked_ips table (cached in Redis)
+  blocklist("block/ip") do |req|
+    # Skip admin endpoints so admins can still unblock
+    next false if req.path.start_with?("/api/v1/admins/")
+    # Skip health check
+    next false if req.path == "/health"
+
+    BlockedIp.blocked?(req.ip)
+  end
+
   # Block suspicious requests (SQL injection attempts, etc.)
   blocklist("block/malicious") do |req|
     Rack::Attack::Fail2Ban.filter("pentesters-#{req.ip}", maxretry: 3, findtime: 10.minutes, bantime: 1.hour) do

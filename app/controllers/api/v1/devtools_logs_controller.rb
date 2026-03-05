@@ -24,6 +24,15 @@ class Api::V1::DevtoolsLogsController < ApplicationController
       log.email = user.email
     end
 
+    # GeoIP lookup (only on first create or if missing)
+    if log.country.blank?
+      geo = GeoipLookupService.lookup(ip)
+      if geo
+        log.country = geo[:country]
+        log.city = geo[:city]
+      end
+    end
+
     log.save!
 
     head :no_content

@@ -22,6 +22,7 @@ Rails.application.routes.draw do
       resources :public_feedbacks, only: [:index]
       get "leaderboard", to: "leaderboard#index"
       resources :devtools_logs, only: [:create]
+      get "ip_check", to: "ip_check#show"
 
       # User OAuth & API
       namespace :users do
@@ -65,6 +66,7 @@ Rails.application.routes.draw do
         resources :user_notifications, only: [:index, :show, :create, :update, :destroy]
         resources :quick_replies
         resources :devtools_logs, only: [:index]
+        resources :blocked_ips, only: [:index, :create, :destroy]
         resources :chat_rooms, only: [:index, :update], param: :uid
         resources :users, only: [:index, :show, :update, :destroy] do
           resources :srs_cards, only: [:index], controller: "user_srs_cards"

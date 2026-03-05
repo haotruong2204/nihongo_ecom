@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_05_100001) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_05_120001) do
   create_table "admin_notifications", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "title", null: false
     t.text "body"
@@ -36,6 +36,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_05_100001) do
     t.index ["email"], name: "index_admins_on_email", unique: true
     t.index ["jti"], name: "index_admins_on_jti", unique: true
     t.index ["reset_password_token"], name: "index_admins_on_reset_password_token", unique: true
+  end
+
+  create_table "blocked_ips", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.string "ip_address", limit: 45, null: false
+    t.string "reason", limit: 500
+    t.bigint "blocked_by_id"
+    t.datetime "created_at", null: false
+    t.index ["blocked_by_id"], name: "index_blocked_ips_on_blocked_by_id"
+    t.index ["ip_address"], name: "index_blocked_ips_on_ip_address", unique: true
   end
 
   create_table "chat_rooms", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
@@ -89,6 +98,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_05_100001) do
     t.integer "open_count", default: 1, null: false
     t.datetime "last_detected_at", null: false
     t.datetime "created_at", null: false
+    t.string "country", limit: 100
+    t.string "city", limit: 100
     t.index ["ip_address"], name: "index_devtools_logs_on_ip_address"
     t.index ["last_detected_at"], name: "index_devtools_logs_on_last_detected_at"
     t.index ["user_id"], name: "index_devtools_logs_on_user_id"
@@ -279,6 +290,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_05_100001) do
     t.index ["uid"], name: "index_users_on_uid", unique: true
   end
 
+  add_foreign_key "blocked_ips", "admins", column: "blocked_by_id"
   add_foreign_key "chat_rooms", "users"
   add_foreign_key "contacts", "users"
   add_foreign_key "custom_vocab_items", "users"
