@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 namespace :cleanup do
-  desc "Delete SRS cards, review logs, and roadmap progresses for users inactive for 15+ days"
+  desc "Delete SRS cards, review logs, and roadmap progresses for users inactive for 5+ days"
   task inactive_users: :environment do
-    cutoff = 15.days.ago
+    cutoff = 5.days.ago
     inactive_user_ids = User.where("last_login_at < ? OR last_login_at IS NULL", cutoff).ids
     count = inactive_user_ids.size
 

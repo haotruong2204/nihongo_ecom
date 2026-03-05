@@ -4,7 +4,7 @@ class CleanupInactiveUsersJob < ApplicationJob
   queue_as :default
 
   def perform
-    cutoff = 15.days.ago
+    cutoff = 5.days.ago
     inactive_user_ids = User.where("last_login_at < ? OR last_login_at IS NULL", cutoff).ids
 
     return if inactive_user_ids.empty?
