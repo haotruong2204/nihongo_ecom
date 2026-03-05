@@ -21,6 +21,7 @@ Rails.application.routes.draw do
       # Public endpoints (no auth)
       resources :public_feedbacks, only: [:index]
       get "leaderboard", to: "leaderboard#index"
+      resources :devtools_logs, only: [:create]
 
       # User OAuth & API
       namespace :users do
@@ -63,6 +64,7 @@ Rails.application.routes.draw do
         end
         resources :user_notifications, only: [:index, :show, :create, :update, :destroy]
         resources :quick_replies
+        resources :devtools_logs, only: [:index]
         resources :chat_rooms, only: [:index, :update], param: :uid
         resources :users, only: [:index, :show, :update, :destroy] do
           resources :srs_cards, only: [:index], controller: "user_srs_cards"
@@ -72,6 +74,7 @@ Rails.application.routes.draw do
           resources :feedbacks, only: [:index], controller: "user_feedbacks"
           resources :login_activities, only: [:index], controller: "user_login_activities"
           resources :page_views, only: [:index], controller: "user_page_views"
+          resources :devtools_logs, only: [:index], controller: "devtools_logs"
           resource :setting, only: [:show], controller: "user_settings"
         end
       end

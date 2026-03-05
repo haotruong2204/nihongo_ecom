@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_03_110001) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_05_100001) do
   create_table "admin_notifications", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "title", null: false
     t.text "body"
@@ -79,6 +79,19 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_03_110001) do
     t.index ["user_id", "position"], name: "index_custom_vocab_items_on_user_id_and_position"
     t.index ["user_id", "word"], name: "index_custom_vocab_items_on_user_id_and_word", unique: true
     t.index ["user_id"], name: "index_custom_vocab_items_on_user_id"
+  end
+
+  create_table "devtools_logs", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.bigint "user_id"
+    t.string "ip_address", limit: 45, null: false
+    t.string "user_agent", limit: 500
+    t.string "email"
+    t.integer "open_count", default: 1, null: false
+    t.datetime "last_detected_at", null: false
+    t.datetime "created_at", null: false
+    t.index ["ip_address"], name: "index_devtools_logs_on_ip_address"
+    t.index ["last_detected_at"], name: "index_devtools_logs_on_last_detected_at"
+    t.index ["user_id"], name: "index_devtools_logs_on_user_id"
   end
 
   create_table "feedbacks", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
@@ -269,6 +282,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_03_110001) do
   add_foreign_key "chat_rooms", "users"
   add_foreign_key "contacts", "users"
   add_foreign_key "custom_vocab_items", "users"
+  add_foreign_key "devtools_logs", "users", on_delete: :cascade
   add_foreign_key "feedbacks", "feedbacks", column: "parent_id", on_delete: :cascade
   add_foreign_key "feedbacks", "users"
   add_foreign_key "jlpt_test_results", "users"
