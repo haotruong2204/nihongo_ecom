@@ -58,7 +58,7 @@ class CacheDashboardStatsJob < ApplicationJob
   end
 
   def build_daily_activity
-    start = 30.days.ago.beginning_of_day
+    start = 29.days.ago.beginning_of_day
     dates = (0..29).map { |i| (start + i.days).to_date }
     labels = dates.map { |d| d.strftime("%m/%d/%Y") }
 
