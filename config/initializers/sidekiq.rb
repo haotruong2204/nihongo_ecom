@@ -20,6 +20,12 @@ Sidekiq.configure_server do |config|
         "class" => "CacheDashboardStatsJob",
         "queue" => "default",
         "description" => "Pre-compute and cache dashboard statistics in Redis"
+      },
+      "cache_leaderboard" => {
+        "cron" => "*/10 * * * *", # Every 10 minutes
+        "class" => "CacheLeaderboardJob",
+        "queue" => "default",
+        "description" => "Pre-compute and cache leaderboard rankings in Redis"
       }
     }
 

@@ -20,6 +20,7 @@ Rails.application.routes.draw do
     namespace :v1 do
       # Public endpoints (no auth)
       resources :public_feedbacks, only: [:index]
+      get "leaderboard", to: "leaderboard#index"
 
       # User OAuth & API
       namespace :users do
