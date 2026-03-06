@@ -69,9 +69,20 @@ class UserNotification < ApplicationRecord
   def self.notify_learning_too_fast user
     create(
       user_id: user.id,
-      title: "Bạn đang học quá nhanh!",
-      body: "Hệ thống phát hiện bạn đang có dấu hiệu của việc spam. " \
-            "Nếu chỉ là đang học nhanh quá, hãy điều chỉnh 1 chút nhé!",
+      title: "Bạn đang ôn tập quá nhanh!",
+      body: "Hệ thống phát hiện bạn đã ôn hơn 500 thẻ trong 1 giờ. " \
+            "Hãy dành thời gian suy nghĩ trước khi trả lời để SRS hiệu quả hơn nhé!",
+      notification_type: "warning",
+      created_by: "system"
+    )
+  end
+
+  def self.notify_spam_detected user
+    create(
+      user_id: user.id,
+      title: "Cảnh báo: Phát hiện hoạt động bất thường",
+      body: "Tài khoản của bạn đã gửi quá nhiều request trong thời gian ngắn. " \
+            "Nếu bạn đang sử dụng công cụ tự động, vui lòng dừng lại.",
       notification_type: "warning",
       created_by: "system"
     )

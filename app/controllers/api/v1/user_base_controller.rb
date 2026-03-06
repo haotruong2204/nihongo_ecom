@@ -30,39 +30,53 @@ class Api::V1::UserBaseController < ApplicationController
 
   private
 
-  REQUEST_LIMIT = 500
-  REQUEST_PERIOD = 1.hour
-  ABUSE_ALERT_COOLDOWN = 24.hours
+  REVIEW_LIMIT = 500        # ~7s/card sustained = learning too fast
+  SPAM_LIMIT = 1500         # write requests/hour = spam/abuse
+  RATE_PERIOD = 1.hour
+  ALERT_COOLDOWN = 24.hours
 
   def track_request_rate
     return unless current_user
+    return if request.get? || request.head?
 
     redis = Redis.new(url: ENV.fetch("REDIS_URL", "redis://localhost:6379"))
-    key = "user_req_count:#{current_user.id}"
+    uid = current_user.id
 
-    count = redis.incr(key)
-    redis.expire(key, REQUEST_PERIOD.to_i) if count == 1
+    # Track all write requests for spam detection
+    spam_key = "user_write_count:#{uid}"
+    spam_count = redis.incr(spam_key)
+    redis.expire(spam_key, RATE_PERIOD.to_i) if spam_count == 1
 
-    daily_key = "daily_req_count:#{Date.today}"
-    redis.incr(daily_key)
-    redis.expire(daily_key, 48.hours.to_i) if redis.ttl(daily_key) < 0
+    # Track SRS reviews separately for "learning too fast" detection
+    is_review = controller_name == "review_logs" && action_name == "create"
+    if is_review
+      review_key = "user_review_count:#{uid}"
+      review_count = redis.incr(review_key)
+      redis.expire(review_key, RATE_PERIOD.to_i) if review_count == 1
 
-    if count == REQUEST_LIMIT
-      cooldown_key = "abuse_alert_sent:#{current_user.id}"
-      already_alerted = redis.exists?(cooldown_key)
+      if review_count == REVIEW_LIMIT
+        cooldown_key = "learning_fast_sent:#{uid}"
+        unless redis.exists?(cooldown_key)
+          redis.set(cooldown_key, 1, ex: ALERT_COOLDOWN.to_i)
+          UserNotification.notify_learning_too_fast(current_user)
+        end
+      end
+    end
 
-      unless already_alerted
-        redis.set(cooldown_key, 1, ex: ABUSE_ALERT_COOLDOWN.to_i)
+    if spam_count == SPAM_LIMIT
+      cooldown_key = "abuse_alert_sent:#{uid}"
+      unless redis.exists?(cooldown_key)
+        redis.set(cooldown_key, 1, ex: ALERT_COOLDOWN.to_i)
 
         AdminNotification.create(
-          title: "Cảnh báo: #{current_user.email} đã gửi #{REQUEST_LIMIT} request/giờ",
-          body: "User ##{current_user.id} (#{current_user.email}) đã đạt #{REQUEST_LIMIT} requests trong 1 giờ. Có thể là hành vi bất thường.",
-          link: "/users/#{current_user.id}",
+          title: "Spam: #{current_user.email} — #{SPAM_LIMIT} writes/giờ",
+          body: "User ##{uid} (#{current_user.email}) đã đạt #{SPAM_LIMIT} write requests trong 1 giờ. Có thể là bot hoặc scraper.",
+          link: "/users/#{uid}",
           notification_type: "abuse_alert",
           created_by: "system"
         )
 
-        UserNotification.notify_learning_too_fast(current_user)
+        UserNotification.notify_spam_detected(current_user)
       end
     end
   rescue Redis::BaseError => e
