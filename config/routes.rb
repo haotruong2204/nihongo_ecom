@@ -30,7 +30,11 @@ Rails.application.routes.draw do
         get "me", to: "dashboard#me"
         resource :setting, only: [:show, :update]
         resources :srs_cards, only: [:index, :show, :create, :update, :destroy]
-        resources :review_logs, only: [:index, :show, :create]
+        resources :review_logs, only: [:index, :show, :create] do
+          collection do
+            get :stats
+          end
+        end
         resources :roadmap_day_progresses, only: [:index, :show, :create, :update, :destroy]
         resources :custom_vocab_items, only: [:index, :show, :create, :update, :destroy]
         resources :vocab_sets, only: [:index, :show, :create, :update, :destroy] do
