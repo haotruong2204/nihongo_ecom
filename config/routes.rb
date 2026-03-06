@@ -33,6 +33,11 @@ Rails.application.routes.draw do
         resources :review_logs, only: [:index, :show, :create]
         resources :roadmap_day_progresses, only: [:index, :show, :create, :update, :destroy]
         resources :custom_vocab_items, only: [:index, :show, :create, :update, :destroy]
+        resources :vocab_sets, only: [:index, :show, :create, :update, :destroy] do
+          member do
+            put :sync_items
+          end
+        end
         resources :feedbacks, only: [:index, :show, :create]
         resources :notifications, only: [:index], controller: "notifications" do
           collection do

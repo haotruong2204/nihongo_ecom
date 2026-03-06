@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_05_130001) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_06_100003) do
   create_table "admin_notifications", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "title", null: false
     t.text "body"
@@ -78,6 +78,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_05_130001) do
 
   create_table "custom_vocab_items", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "user_id", null: false
+    t.bigint "vocab_set_id", null: false
     t.string "word", null: false
     t.string "reading", null: false
     t.string "hanviet", default: "", null: false
@@ -86,8 +87,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_05_130001) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id", "position"], name: "index_custom_vocab_items_on_user_id_and_position"
-    t.index ["user_id", "word"], name: "index_custom_vocab_items_on_user_id_and_word", unique: true
     t.index ["user_id"], name: "index_custom_vocab_items_on_user_id"
+    t.index ["vocab_set_id", "word"], name: "index_custom_vocab_items_on_vocab_set_id_and_word", unique: true
+    t.index ["vocab_set_id"], name: "index_custom_vocab_items_on_vocab_set_id"
   end
 
   create_table "devtools_logs", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
@@ -291,10 +293,21 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_05_130001) do
     t.index ["uid"], name: "index_users_on_uid", unique: true
   end
 
+  create_table "vocab_sets", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "name", limit: 100, null: false
+    t.integer "position", default: 0, null: false, unsigned: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.json "items"
+    t.index ["user_id"], name: "index_vocab_sets_on_user_id"
+  end
+
   add_foreign_key "blocked_ips", "admins", column: "blocked_by_id"
   add_foreign_key "chat_rooms", "users"
   add_foreign_key "contacts", "users"
   add_foreign_key "custom_vocab_items", "users"
+  add_foreign_key "custom_vocab_items", "vocab_sets", on_delete: :cascade
   add_foreign_key "devtools_logs", "users", on_delete: :cascade
   add_foreign_key "feedbacks", "feedbacks", column: "parent_id", on_delete: :cascade
   add_foreign_key "feedbacks", "users"
@@ -308,4 +321,5 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_05_130001) do
   add_foreign_key "user_notifications", "feedbacks", on_delete: :cascade
   add_foreign_key "user_notifications", "users"
   add_foreign_key "user_settings", "users"
+  add_foreign_key "vocab_sets", "users"
 end

@@ -11,6 +11,7 @@ class User < ApplicationRecord
   has_many :srs_cards, dependent: :destroy
   has_many :review_logs, dependent: :destroy
   has_many :roadmap_day_progresses, dependent: :destroy
+  has_many :vocab_sets, dependent: :destroy
   has_many :custom_vocab_items, dependent: :destroy
   has_one :user_setting, dependent: :destroy
   has_many :feedbacks, dependent: :nullify
