@@ -28,7 +28,12 @@ class Api::V1::Users::SrsCardsController < Api::V1::UserBaseController
 
   def create
     srs_card = current_user.srs_cards.find_or_initialize_by(kanji: srs_card_params[:kanji])
-    srs_card.assign_attributes(srs_card_params) if srs_card.new_record?
+    if srs_card.new_record?
+      srs_card.assign_attributes(srs_card_params)
+    else
+      # Update vocab metadata for existing cards
+      srs_card.assign_attributes(srs_card_params.slice(:reading, :meaning, :hanviet, :accents).compact_blank)
+    end
 
     if srs_card.save
       response_success({
@@ -72,6 +77,7 @@ class Api::V1::Users::SrsCardsController < Api::V1::UserBaseController
 
   def srs_card_params
     params.require(:srs_card).permit(:kanji, :state, :ease, :interval, :due_date,
-                                     :reviews_count, :lapses_count, :last_review_at)
+                                     :reviews_count, :lapses_count, :last_review_at,
+                                     :reading, :meaning, :hanviet, accents: [])
   end
 end

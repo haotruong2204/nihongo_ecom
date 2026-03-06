@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_06_100003) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_07_100003) do
   create_table "admin_notifications", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "title", null: false
     t.text "body"
@@ -213,7 +213,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_06_100003) do
 
   create_table "srs_cards", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "user_id", null: false
-    t.string "kanji", limit: 10, null: false
+    t.string "kanji", limit: 100, null: false
     t.integer "state", limit: 1, default: 0, null: false
     t.decimal "ease", precision: 4, scale: 2, default: "2.5", null: false
     t.integer "interval", default: 0, null: false, unsigned: true
@@ -223,6 +223,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_06_100003) do
     t.datetime "last_review_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "reading", limit: 200
+    t.string "meaning", limit: 500
+    t.string "hanviet", limit: 200
+    t.json "accents"
     t.index ["user_id", "due_date"], name: "index_srs_cards_on_user_id_and_due_date"
     t.index ["user_id", "interval"], name: "index_srs_cards_on_user_id_and_interval"
     t.index ["user_id", "kanji"], name: "index_srs_cards_on_user_id_and_kanji", unique: true

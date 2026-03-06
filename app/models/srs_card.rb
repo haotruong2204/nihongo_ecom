@@ -5,7 +5,7 @@ class SrsCard < ApplicationRecord
 
   enum :state, { new_card: 0, learning: 1, review: 2, relearning: 3 }
 
-  validates :kanji, presence: true, length: { maximum: 10 }
+  validates :kanji, presence: true, length: { maximum: 100 }
   validates :kanji, uniqueness: { scope: :user_id }
   validates :ease, presence: true, numericality: { greater_than_or_equal_to: 1.3 }
   validates :interval, presence: true, numericality: { greater_than_or_equal_to: 0 }
