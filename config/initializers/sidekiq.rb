@@ -21,6 +21,12 @@ Sidekiq.configure_server do |config|
         "queue" => "default",
         "description" => "Pre-compute and cache dashboard statistics in Redis"
       },
+      "expire_premium" => {
+        "cron" => "0 0 * * *", # Every day at midnight
+        "class" => "ExpirePremiumJob",
+        "queue" => "default",
+        "description" => "Set is_premium=false for users whose premium_until has passed"
+      },
       "cache_leaderboard" => {
         "cron" => "*/10 * * * *", # Every 10 minutes
         "class" => "CacheLeaderboardJob",
