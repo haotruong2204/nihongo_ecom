@@ -42,6 +42,7 @@ Rails.application.routes.draw do
             put :sync_items
           end
         end
+        resources :tango_lesson_progresses, only: [:index, :create]
         resources :feedbacks, only: [:index, :show, :create]
         resources :notifications, only: [:index], controller: "notifications" do
           collection do
@@ -78,10 +79,16 @@ Rails.application.routes.draw do
         resources :blocked_ips, only: [:index, :create, :destroy]
         resources :chat_rooms, only: [:index, :update], param: :uid
         resources :users, only: [:index, :show, :update, :destroy] do
-          resources :srs_cards, only: [:index], controller: "user_srs_cards"
+          resources :srs_cards, only: [:index, :destroy], controller: "user_srs_cards" do
+            member do
+              patch :reset
+            end
+          end
           resources :review_logs, only: [:index], controller: "user_review_logs"
           resources :roadmap_day_progresses, only: [:index], controller: "user_roadmap_day_progresses"
           resources :custom_vocab_items, only: [:index], controller: "user_custom_vocab_items"
+          resources :tango_lesson_progresses, only: [:index], controller: "user_tango_lesson_progresses"
+          resources :jlpt_test_results, only: [:index], controller: "user_jlpt_test_results"
           resources :feedbacks, only: [:index], controller: "user_feedbacks"
           resources :login_activities, only: [:index], controller: "user_login_activities"
           resources :page_views, only: [:index], controller: "user_page_views"

@@ -3,12 +3,16 @@
 class TangoLessonProgress < ApplicationRecord
   belongs_to :user
 
-  validates :book_id, presence: true, length: { maximum: 50 }
-  validates :lesson_id, presence: true, length: { maximum: 100 }
-  validates :lesson_id, uniqueness: { scope: [:user_id, :book_id] }
-  validates :known_count, presence: true, numericality: { greater_than_or_equal_to: 0 }
-  validates :total_count, presence: true, numericality: { greater_than_or_equal_to: 0 }
+  validates :book_id, presence: true
+  validates :lesson_id, presence: true
+  validates :lesson_id, uniqueness: { scope: %i[user_id book_id] }
+  validates :known_count, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+  validates :total_count, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
 
-  scope :for_book, ->(book_id) { where(book_id: book_id) }
   scope :completed, -> { where(completed: true) }
+  scope :for_book, ->(book_id) { where(book_id: book_id) }
+
+  def self.ransackable_attributes(_auth_object = nil)
+    %w[book_id lesson_id completed last_studied_at created_at]
+  end
 end
