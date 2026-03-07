@@ -5,7 +5,10 @@ class CleanupInactiveUsersJob < ApplicationJob
 
   def perform
     cutoff = 5.days.ago
-    inactive_user_ids = User.where("last_login_at < ? OR last_login_at IS NULL", cutoff).ids
+    inactive_user_ids = User
+      .where("last_login_at < ? OR last_login_at IS NULL", cutoff)
+      .where(is_premium: false)
+      .ids
 
     return if inactive_user_ids.empty?
 
