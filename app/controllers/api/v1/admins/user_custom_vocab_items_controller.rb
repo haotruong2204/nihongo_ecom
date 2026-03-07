@@ -4,6 +4,7 @@ class Api::V1::Admins::UserCustomVocabItemsController < Api::V1::BaseController
   include Pagy::Backend
 
   before_action :set_user
+  before_action :set_item, only: [:destroy]
 
   def index
     q = @user.custom_vocab_items.ransack(params[:q])
@@ -18,10 +19,21 @@ class Api::V1::Admins::UserCustomVocabItemsController < Api::V1::BaseController
                      })
   end
 
+  def destroy
+    @item.destroy!
+    response_success({ code: 200, message: I18n.t("api.common.delete_success"), status: :ok })
+  end
+
   private
 
   def set_user
     @user = User.find(params[:user_id])
+  rescue ActiveRecord::RecordNotFound
+    not_found
+  end
+
+  def set_item
+    @item = @user.custom_vocab_items.find(params[:id])
   rescue ActiveRecord::RecordNotFound
     not_found
   end

@@ -32,6 +32,7 @@ class Api::V1::Admins::UsersController < Api::V1::BaseController
       stats = {
         srs_cards_count: @user.srs_cards.count,
         review_logs_count: @user.review_logs.count,
+        vocab_sets_count: @user.vocab_sets.count,
         custom_vocab_items_count: @user.custom_vocab_items.count,
         roadmap_day_progresses_count: @user.roadmap_day_progresses.count,
         tango_lesson_progresses_count: @user.tango_lesson_progresses.count,

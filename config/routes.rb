@@ -86,7 +86,12 @@ Rails.application.routes.draw do
           end
           resources :review_logs, only: [:index], controller: "user_review_logs"
           resources :roadmap_day_progresses, only: [:index], controller: "user_roadmap_day_progresses"
-          resources :custom_vocab_items, only: [:index], controller: "user_custom_vocab_items"
+          resources :custom_vocab_items, only: [:index, :destroy], controller: "user_custom_vocab_items"
+          resources :vocab_sets, only: [:index, :destroy], controller: "user_vocab_sets" do
+            member do
+              delete :remove_item
+            end
+          end
           resources :tango_lesson_progresses, only: [:index], controller: "user_tango_lesson_progresses"
           resources :jlpt_test_results, only: [:index], controller: "user_jlpt_test_results"
           resources :feedbacks, only: [:index], controller: "user_feedbacks"
