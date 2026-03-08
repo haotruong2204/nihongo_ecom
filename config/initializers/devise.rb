@@ -320,6 +320,6 @@ Devise.setup do |config|
       ["DELETE", %r{^/api/v1/admins/sign_out}]
     ]
     jwt.request_formats = { admin: [:json], user: [:json] }
-    jwt.expiration_time = 1.day.to_i
+    jwt.expiration_time = 3.days.to_i
   end
 end
