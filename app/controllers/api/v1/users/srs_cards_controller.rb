@@ -3,9 +3,11 @@
 class Api::V1::Users::SrsCardsController < Api::V1::UserBaseController
   before_action :set_srs_card, only: [:show, :update, :destroy]
   before_action :require_srs_card, only: [:show, :update]
+  before_action :sync_slots_locked_on_expiry
 
   def index
-    q = current_user.srs_cards.ransack(params[:q])
+    scope = accessible_srs_cards
+    q = scope.ransack(params[:q])
     pagy, srs_cards = pagy(q.result.order(created_at: :desc), limit: params[:per_page] || 20)
 
     response_success({
@@ -28,6 +30,22 @@ class Api::V1::Users::SrsCardsController < Api::V1::UserBaseController
 
   FREE_KANJI_LIMIT = 50
   FREE_VOCAB_LIMIT = 100
+
+  # Enforce slot-lock flags whenever premium has expired and user is over free limits.
+  # Runs lazily on each request so no background job is needed.
+  def sync_slots_locked_on_expiry
+    return if current_user.premium?
+
+    unless current_user.vocab_slots_locked?
+      vocab_count = current_user.srs_cards.where.not(reading: [nil, ""]).count
+      current_user.update_column(:vocab_slots_locked, true) if vocab_count > FREE_VOCAB_LIMIT
+    end
+
+    unless current_user.kanji_slots_locked?
+      kanji_count = current_user.srs_cards.where(reading: [nil, ""]).count
+      current_user.update_column(:kanji_slots_locked, true) if kanji_count > FREE_KANJI_LIMIT
+    end
+  end
 
   def create
     srs_card = current_user.srs_cards.find_or_initialize_by(kanji: srs_card_params[:kanji])
@@ -93,8 +111,29 @@ class Api::V1::Users::SrsCardsController < Api::V1::UserBaseController
 
   private
 
+  # For premium users: all cards.
+  # For free users: oldest FREE_KANJI_LIMIT kanji + oldest FREE_VOCAB_LIMIT vocab.
+  # "Oldest first" so data accumulated before premium expires is the locked portion,
+  # not the data the user had as a free user.
+  def accessible_srs_cards
+    return current_user.srs_cards if current_user.premium?
+
+    kanji_ids = current_user.srs_cards
+                            .where(reading: [nil, ""])
+                            .order(:created_at)
+                            .limit(FREE_KANJI_LIMIT)
+                            .ids
+    vocab_ids = current_user.srs_cards
+                            .where.not(reading: [nil, ""])
+                            .order(:created_at)
+                            .limit(FREE_VOCAB_LIMIT)
+                            .ids
+
+    current_user.srs_cards.where(id: kanji_ids + vocab_ids)
+  end
+
   def set_srs_card
-    @srs_card = current_user.srs_cards.find_by(id: params[:id])
+    @srs_card = accessible_srs_cards.find_by(id: params[:id])
   end
 
   def require_srs_card
