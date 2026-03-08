@@ -26,8 +26,28 @@ class Api::V1::Users::SrsCardsController < Api::V1::UserBaseController
                      })
   end
 
+  FREE_KANJI_LIMIT = 50
+  FREE_VOCAB_LIMIT = 100
+
   def create
     srs_card = current_user.srs_cards.find_or_initialize_by(kanji: srs_card_params[:kanji])
+
+    # Enforce free-tier limits on new cards only
+    if srs_card.new_record? && !current_user.premium?
+      is_vocab = srs_card_params[:reading].present?
+      if is_vocab
+        vocab_count = current_user.srs_cards.where.not(reading: [nil, ""]).count
+        if vocab_count >= FREE_VOCAB_LIMIT
+          return render json: { message: "FREE_LIMIT_REACHED", detail: "Giới hạn #{FREE_VOCAB_LIMIT} từ vựng cho tài khoản miễn phí" }, status: :forbidden
+        end
+      else
+        kanji_count = current_user.srs_cards.where(reading: [nil, ""]).count
+        if kanji_count >= FREE_KANJI_LIMIT
+          return render json: { message: "FREE_LIMIT_REACHED", detail: "Giới hạn #{FREE_KANJI_LIMIT} kanji cho tài khoản miễn phí" }, status: :forbidden
+        end
+      end
+    end
+
     if srs_card.new_record?
       srs_card.assign_attributes(srs_card_params)
     else
