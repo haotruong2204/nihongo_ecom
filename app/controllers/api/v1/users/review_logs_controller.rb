@@ -122,9 +122,11 @@ class Api::V1::Users::ReviewLogsController < Api::V1::UserBaseController
   def apply_type_filter(scope)
     case params[:type]
     when "kanji"
-      scope.where("CHAR_LENGTH(kanji) = 1")
+      scope.joins("LEFT JOIN srs_cards ON srs_cards.kanji = review_logs.kanji AND srs_cards.user_id = review_logs.user_id")
+           .where("srs_cards.reading IS NULL OR srs_cards.reading = ''")
     when "vocab"
-      scope.where("CHAR_LENGTH(kanji) > 1")
+      scope.joins("LEFT JOIN srs_cards ON srs_cards.kanji = review_logs.kanji AND srs_cards.user_id = review_logs.user_id")
+           .where("srs_cards.reading IS NOT NULL AND srs_cards.reading != ''")
     else
       scope
     end
