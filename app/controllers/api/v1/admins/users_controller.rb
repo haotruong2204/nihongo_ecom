@@ -57,6 +57,7 @@ class Api::V1::Admins::UsersController < Api::V1::BaseController
 
   def update
     was_banned = @user.is_banned
+    was_premium = @user.is_premium
     if @user.update(user_params)
       # If admin just banned user → invalidate JWT to force logout on next request
       if @user.is_banned && !was_banned
@@ -66,6 +67,11 @@ class Api::V1::Admins::UsersController < Api::V1::BaseController
       # If admin just unbanned user → reset conflict count
       if was_banned && !@user.is_banned
         @user.login_activities.conflicts.update_all(session_conflict: false)
+      end
+
+      # If admin just upgraded user to premium → send notification
+      if @user.is_premium && !was_premium
+        UserNotification.notify_upgrade_success(@user)
       end
 
       response_success({

@@ -88,6 +88,19 @@ class UserNotification < ApplicationRecord
     )
   end
 
+  def self.notify_upgrade_success user
+    until_text = user.premium_until ? " đến #{user.premium_until.strftime('%d/%m/%Y')}" : ""
+    create(
+      user_id: user.id,
+      title: "Tài khoản đã được nâng cấp Premium!",
+      body: "Chúc mừng! Tài khoản của bạn đã được nâng cấp lên Premium#{until_text}. " \
+            "Bạn có thể sử dụng đầy đủ tính năng: SRS từ vựng, nhiều bộ học, và hơn thế nữa!",
+      link: "/nang-cap",
+      notification_type: "upgrade_success",
+      created_by: "system"
+    )
+  end
+
   def self.notify_feedback_approved feedback
     return unless feedback.user_id
 
