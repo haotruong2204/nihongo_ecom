@@ -40,7 +40,7 @@ class CacheLeaderboardJob < ApplicationJob
 
     # Fetch user info
     users = User.where(id: active_user_ids, is_banned: false)
-                .select(:id, :uid, :display_name, :photo_url)
+                .select(:id, :uid, :display_name, :photo_url, :is_premium, :premium_until)
                 .index_by(&:id)
 
     # Build entries sorted by review count desc
@@ -55,7 +55,8 @@ class CacheLeaderboardJob < ApplicationJob
           totalReviews: review_counts[user_id] || 0,
           srsCards: srs_counts[user_id] || 0,
           roadmapDays: roadmap_counts[user_id] || 0,
-          streakDays: streaks[user_id] || 0
+          streakDays: streaks[user_id] || 0,
+          isPremium: user.premium?
         }
       end
       .sort_by { |e| -e[:totalReviews] }

@@ -68,7 +68,8 @@ class Api::V1::LeaderboardController < ApplicationController
       "totalReviews" => total_reviews,
       "srsCards" => srs_cards,
       "roadmapDays" => roadmap_days,
-      "streakDays" => 0
+      "streakDays" => 0,
+      "isPremium" => user.premium?
     }
   end
 end
