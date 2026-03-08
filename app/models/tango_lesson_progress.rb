@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class TangoLessonProgress < ApplicationRecord
-  belongs_to :user
+  belongs_to :user, counter_cache: true
 
   validates :book_id, presence: true
   validates :lesson_id, presence: true

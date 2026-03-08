@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class VocabSet < ApplicationRecord
-  belongs_to :user
+  belongs_to :user, counter_cache: true
 
   attribute :items, default: []
 
