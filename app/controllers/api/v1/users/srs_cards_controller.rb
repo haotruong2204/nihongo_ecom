@@ -36,13 +36,19 @@ class Api::V1::Users::SrsCardsController < Api::V1::UserBaseController
     if srs_card.new_record? && !current_user.premium?
       is_vocab = srs_card_params[:reading].present?
       if is_vocab
-        vocab_count = current_user.srs_cards.where.not(reading: [nil, ""]).count
-        if vocab_count >= FREE_VOCAB_LIMIT
+        unless current_user.vocab_slots_locked?
+          vocab_count = current_user.srs_cards.where.not(reading: [nil, ""]).count
+          current_user.update_column(:vocab_slots_locked, true) if vocab_count >= FREE_VOCAB_LIMIT
+        end
+        if current_user.vocab_slots_locked?
           return render json: { message: "FREE_LIMIT_REACHED", detail: "Giới hạn #{FREE_VOCAB_LIMIT} từ vựng cho tài khoản miễn phí" }, status: :forbidden
         end
       else
-        kanji_count = current_user.srs_cards.where(reading: [nil, ""]).count
-        if kanji_count >= FREE_KANJI_LIMIT
+        unless current_user.kanji_slots_locked?
+          kanji_count = current_user.srs_cards.where(reading: [nil, ""]).count
+          current_user.update_column(:kanji_slots_locked, true) if kanji_count >= FREE_KANJI_LIMIT
+        end
+        if current_user.kanji_slots_locked?
           return render json: { message: "FREE_LIMIT_REACHED", detail: "Giới hạn #{FREE_KANJI_LIMIT} kanji cho tài khoản miễn phí" }, status: :forbidden
         end
       end
