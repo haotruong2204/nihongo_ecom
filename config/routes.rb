@@ -36,6 +36,10 @@ Rails.application.routes.draw do
           end
         end
         resources :roadmap_day_progresses, only: [:index, :show, :create, :update, :destroy]
+        resources :custom_roadmaps, only: [:index, :show, :create, :update, :destroy] do
+          resources :day_progresses, only: [:index, :create],
+                    controller: "custom_roadmap_day_progresses"
+        end
         resources :custom_vocab_items, only: [:index, :show, :create, :update, :destroy]
         resources :vocab_sets, only: [:index, :show, :create, :update, :destroy] do
           member do

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_08_100001) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_08_130002) do
   create_table "admin_notifications", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "title", null: false
     t.text "body"
@@ -74,6 +74,29 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_08_100001) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_contacts_on_user_id"
+  end
+
+  create_table "custom_roadmap_day_progresses", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "custom_roadmap_id", null: false
+    t.integer "day", null: false, unsigned: true
+    t.json "kanji_learned", null: false
+    t.datetime "completed_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["custom_roadmap_id"], name: "index_custom_roadmap_day_progresses_on_custom_roadmap_id"
+    t.index ["user_id", "custom_roadmap_id", "day"], name: "index_custom_roadmap_day_progresses_on_user_roadmap_day", unique: true
+  end
+
+  create_table "custom_roadmaps", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "name", limit: 100, null: false
+    t.json "kanji_list", null: false
+    t.integer "kanji_per_day", default: 10, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "created_at"], name: "index_custom_roadmaps_on_user_id_and_created_at"
+    t.index ["user_id"], name: "index_custom_roadmaps_on_user_id"
   end
 
   create_table "custom_vocab_items", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|

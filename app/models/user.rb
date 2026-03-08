@@ -22,6 +22,8 @@ class User < ApplicationRecord
   has_many :user_notifications, dependent: :destroy
   has_many :login_activities, dependent: :destroy
   has_many :page_views, dependent: :destroy
+  has_many :custom_roadmaps, dependent: :destroy
+  has_many :custom_roadmap_day_progresses, dependent: :destroy
 
   validates :uid, presence: true, uniqueness: true, length: { maximum: 128 }
   validates :email, presence: true, uniqueness: true, length: { maximum: 255 }
