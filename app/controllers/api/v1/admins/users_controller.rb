@@ -69,10 +69,11 @@ class Api::V1::Admins::UsersController < Api::V1::BaseController
         @user.login_activities.conflicts.update_all(session_conflict: false)
       end
 
-      # If admin just upgraded user to premium → reset slot locks + send notification
+      # If admin just upgraded user to premium → reset slot locks + send notification + record revenue
       if @user.is_premium && !was_premium
         @user.update_columns(kanji_slots_locked: false, vocab_slots_locked: false)
         UserNotification.notify_upgrade_success(@user)
+        RevenueRecord.record_upgrade(@user)
       end
 
       response_success({

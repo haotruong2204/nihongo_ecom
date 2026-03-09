@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_08_130002) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_09_100001) do
   create_table "admin_notifications", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "title", null: false
     t.text "body"
@@ -208,6 +208,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_08_130002) do
     t.index ["position"], name: "index_quick_replies_on_position"
   end
 
+  create_table "revenue_records", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.integer "amount", null: false
+    t.string "plan_type", default: "monthly", null: false
+    t.datetime "premium_until"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_revenue_records_on_created_at"
+    t.index ["plan_type"], name: "index_revenue_records_on_plan_type"
+    t.index ["user_id"], name: "index_revenue_records_on_user_id"
+  end
+
   create_table "review_logs", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "kanji", limit: 10, null: false
@@ -345,6 +357,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_08_130002) do
   add_foreign_key "jlpt_test_results", "users"
   add_foreign_key "login_activities", "users", on_delete: :cascade
   add_foreign_key "page_views", "users", on_delete: :cascade
+  add_foreign_key "revenue_records", "users"
   add_foreign_key "review_logs", "users"
   add_foreign_key "roadmap_day_progresses", "users"
   add_foreign_key "srs_cards", "users"
