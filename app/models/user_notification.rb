@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class UserNotification < ApplicationRecord
-  NOTIFICATION_TYPES = %w[feedback new_feature upgrade_success maintenance welcome warning].freeze
+  NOTIFICATION_TYPES = %w[feedback new_feature upgrade_success maintenance welcome warning study_fast].freeze
   CREATED_BY_OPTIONS = %w[system admin].freeze
 
   belongs_to :user
@@ -73,6 +73,17 @@ class UserNotification < ApplicationRecord
       body: "Hệ thống phát hiện bạn đã ôn hơn 500 thẻ trong 1 giờ. " \
             "Hãy dành thời gian suy nghĩ trước khi trả lời để SRS hiệu quả hơn nhé!",
       notification_type: "warning",
+      created_by: "system"
+    )
+  end
+
+  def self.notify_study_fast user
+    create(
+      user_id: user.id,
+      title: "🔥 Bạn đang học quá nhanh!",
+      body: "Hệ thống phát hiện bạn đang lướt qua Kanji rất nhanh. " \
+            "Não cần thời gian để xử lý và ghi nhớ thông tin — hãy nghỉ ngơi 1 tiếng rồi học tiếp nhé!",
+      notification_type: "study_fast",
       created_by: "system"
     )
   end

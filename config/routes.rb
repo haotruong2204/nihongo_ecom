@@ -60,6 +60,7 @@ Rails.application.routes.draw do
         post "chat_messages", to: "chat_status#record_message"
         resources :quick_replies, only: [:index]
         resources :page_views, only: [:create]
+        post "study_alerts", to: "study_alerts#create"
       end
 
       # Admin management
