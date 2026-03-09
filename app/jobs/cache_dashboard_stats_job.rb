@@ -86,11 +86,21 @@ class CacheDashboardStatsJob < ApplicationJob
   end
 
   def build_top_pages
-    PageView.select("url, SUM(view_count) AS total_views")
-            .group(:url)
-            .order("total_views DESC")
-            .limit(10)
-            .map { |pv| { label: pv.url, value: pv.total_views.to_i } }
+    pinned_urls = ["/nang-cap", "/gioi-thieu-tai-lieu"]
+
+    main = PageView.select("url, SUM(view_count) AS total_views")
+                   .where.not(url: pinned_urls)
+                   .group(:url)
+                   .order("total_views DESC")
+                   .limit(10)
+                   .map { |pv| { label: pv.url, value: pv.total_views.to_i } }
+
+    pinned = pinned_urls.map do |url|
+      total = PageView.where(url: url).sum(:view_count)
+      { label: url, value: total.to_i }
+    end
+
+    main + pinned
   end
 
   def build_jlpt_performance
