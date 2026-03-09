@@ -34,7 +34,7 @@ class User < ApplicationRecord
 
   def self.ransackable_attributes _auth_object = nil
     %w[email display_name is_premium is_banned created_at srs_cards_count review_logs_count page_views_count
-       last_login_at]
+       vocab_sets_count tango_lesson_progresses_count last_login_at]
   end
 
   def self.ransackable_associations _auth_object = nil
