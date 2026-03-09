@@ -64,24 +64,36 @@ class Api::V1::Users::OmniauthsController < Api::V1::UserBaseController
     return "Unknown" if ua.blank?
 
     browser = case ua
+              when /Brave/i then "Brave"
               when /Edg/i then "Edge"
-              when /Chrome/i then "Chrome"
+              when /OPR|Opera/i then "Opera"
+              when /SamsungBrowser/i then "Samsung"
               when /Firefox/i then "Firefox"
+              when /Chrome/i then "Chrome"
               when /Safari/i then "Safari"
-              when /Opera|OPR/i then "Opera"
               else "Other"
               end
 
+    # iOS must be checked before macOS — iOS UA contains "Mac OS X"
     os = case ua
+         when /iPhone/i then "iOS"
+         when /iPad/i then "iPadOS"
+         when /Android/i then "Android"
          when /Windows/i then "Windows"
          when /Macintosh|Mac OS/i then "macOS"
          when /Linux/i then "Linux"
-         when /Android/i then "Android"
-         when /iPhone|iPad/i then "iOS"
          else "Other"
          end
 
-    "#{browser} / #{os}"
+    device_type = if ua.match?(/Mobile/i) && !ua.match?(/iPad/i)
+                    "Mobile"
+                  elsif ua.match?(/iPad|Tablet/i)
+                    "Tablet"
+                  else
+                    "Desktop"
+                  end
+
+    "#{browser} / #{os} / #{device_type}"
   end
 
   def geoip_attrs ip
