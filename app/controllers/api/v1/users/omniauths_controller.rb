@@ -39,15 +39,9 @@ class Api::V1::Users::OmniauthsController < Api::V1::UserBaseController
       **geoip_attrs(current_ip)
     )
 
-    # Check conflict escalation
-    if is_conflict
-      conflict_count = user.login_activities.conflicts.count
-
-      if conflict_count >= 21 && !user.banned?
-        user.update!(is_banned: true, banned_reason: "Tự động khóa: chia sẻ tài khoản (#{conflict_count} lần xung đột)")
-      elsif (conflict_count % 20).zero?
-        UserNotification.notify_session_conflict_warning(user)
-      end
+    # Band khi IP thứ 4 hoặc thiết bị thứ 4 xuất hiện
+    if is_conflict && !user.banned?
+      user.update!(is_banned: true, banned_reason: "Có dấu hiệu vi phạm chính sách về share tài khoản")
     end
 
     # Generate new token with fresh jti
