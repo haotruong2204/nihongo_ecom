@@ -62,8 +62,6 @@ Rails.application.routes.draw do
         resources :page_views, only: [:create]
         post "study_alerts", to: "study_alerts#create"
         post "srs_reset", to: "srs_reset#create"
-        resource :push_subscription, only: [:create, :destroy],
-                 controller: "push_subscriptions"
       end
 
       # Admin management
@@ -88,7 +86,6 @@ Rails.application.routes.draw do
         resources :devtools_logs, only: [:index]
         resources :blocked_ips, only: [:index, :create, :destroy]
         resources :chat_rooms, only: [:index, :update], param: :uid
-        post "chat_notifications", to: "chat_notifications#create"
         resources :users, only: [:index, :show, :update, :destroy] do
           member do
             post :recalculate_counters
