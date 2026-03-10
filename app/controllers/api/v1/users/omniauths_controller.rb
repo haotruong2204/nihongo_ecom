@@ -13,12 +13,19 @@ class Api::V1::Users::OmniauthsController < Api::V1::UserBaseController
 
     user = User.create_user_for_google(user_data)
 
-    last_login = user.login_activities.order(created_at: :desc).first
     current_device = parse_device_info(request.user_agent)
     current_ip = request.remote_ip
 
-    is_conflict = last_login.present? &&
-                  (last_login.device_info != current_device || last_login.ip_address != current_ip)
+    known_ips     = user.login_activities.pluck(:ip_address).uniq
+    known_devices = user.login_activities.pluck(:device_info).uniq
+
+    ip_is_new     = !known_ips.include?(current_ip)
+    device_is_new = !known_devices.include?(current_device)
+
+    ip_conflict     = ip_is_new && known_ips.size >= 3
+    device_conflict = device_is_new && known_devices.size >= 3
+
+    is_conflict = ip_conflict || device_conflict
 
     # Regenerate jti → invalidate all old tokens (existing sessions will fail on next API call)
     user.update!(jti: SecureRandom.uuid)
