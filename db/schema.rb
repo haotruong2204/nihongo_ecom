@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_10_041506) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_10_120000) do
   create_table "admin_notifications", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "title", null: false
     t.text "body"
@@ -196,6 +196,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_10_041506) do
     t.index ["user_id"], name: "index_page_views_on_user_id"
   end
 
+  create_table "push_subscriptions", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.text "endpoint", null: false
+    t.string "endpoint_digest", limit: 64, null: false
+    t.string "p256dh_key", null: false
+    t.string "auth_key", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["endpoint_digest"], name: "index_push_subscriptions_on_endpoint_digest", unique: true
+    t.index ["user_id"], name: "index_push_subscriptions_on_user_id"
+  end
+
   create_table "quick_replies", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "title", null: false
     t.text "content", null: false
@@ -358,6 +370,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_10_041506) do
   add_foreign_key "jlpt_test_results", "users"
   add_foreign_key "login_activities", "users", on_delete: :cascade
   add_foreign_key "page_views", "users", on_delete: :cascade
+  add_foreign_key "push_subscriptions", "users"
   add_foreign_key "revenue_records", "users"
   add_foreign_key "review_logs", "users"
   add_foreign_key "roadmap_day_progresses", "users"
