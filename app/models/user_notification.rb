@@ -26,7 +26,7 @@ class UserNotification < ApplicationRecord
     create(
       user_id: user.id,
       title: "Chào mừng đến với website!",
-      body: "Cảm ơn bạn đã đăng ký. Chúc bạn học tốt tiếng Nhật!",
+      body: "Chúc bạn có trải nghiệm học tiếng Nhật tốt nhất!",
       notification_type: "welcome",
       created_by: "system"
     )
@@ -82,7 +82,7 @@ class UserNotification < ApplicationRecord
       user_id: user.id,
       title: "🔥 Bạn đang học quá nhanh!",
       body: "Hệ thống phát hiện bạn đang lướt qua Kanji rất nhanh. " \
-            "Não cần thời gian để xử lý và ghi nhớ thông tin — hãy nghỉ ngơi 1 tiếng rồi học tiếp nhé!",
+            "Não cần thời gian để xử lý và ghi nhớ thông tin — hãy nghỉ ngơi 30 phút rồi học tiếp nhé!",
       notification_type: "study_fast",
       created_by: "system"
     )
