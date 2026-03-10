@@ -105,7 +105,12 @@ class Api::V1::Users::SrsCardsController < Api::V1::UserBaseController
   end
 
   def destroy
-    @srs_card&.destroy
+    if @srs_card
+      kanji = @srs_card.kanji
+      @srs_card.destroy
+      current_user.review_logs.where(kanji: kanji).delete_all
+      User.reset_counters(current_user.id, :review_logs)
+    end
     response_success({ code: 200, message: I18n.t("api.common.delete_success"), status: :ok })
   end
 
