@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_09_100001) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_10_041506) do
   create_table "admin_notifications", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "title", null: false
     t.text "body"
@@ -222,7 +222,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_09_100001) do
 
   create_table "review_logs", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "user_id", null: false
-    t.string "kanji", limit: 10, null: false
+    t.string "kanji", limit: 50, null: false
     t.integer "rating", limit: 1, null: false
     t.integer "interval_before", default: 0, null: false, unsigned: true
     t.integer "interval_after", default: 0, null: false, unsigned: true
@@ -248,7 +248,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_09_100001) do
 
   create_table "srs_cards", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "user_id", null: false
-    t.string "kanji", limit: 100, null: false
+    t.string "kanji", limit: 50, null: false
     t.integer "state", limit: 1, default: 0, null: false
     t.decimal "ease", precision: 4, scale: 2, default: "2.5", null: false
     t.integer "interval", default: 0, null: false, unsigned: true
@@ -331,6 +331,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_09_100001) do
     t.integer "tango_lesson_progresses_count", default: 0, null: false
     t.boolean "kanji_slots_locked", default: false, null: false
     t.boolean "vocab_slots_locked", default: false, null: false
+    t.integer "total_reviews_ever", default: 0, null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["jti"], name: "index_users_on_jti", unique: true
     t.index ["uid"], name: "index_users_on_uid", unique: true

@@ -61,12 +61,14 @@ Rails.application.routes.draw do
         resources :quick_replies, only: [:index]
         resources :page_views, only: [:create]
         post "study_alerts", to: "study_alerts#create"
+        post "srs_reset", to: "srs_reset#create"
       end
 
       # Admin management
       namespace :admins do
         get "me", to: "dashboard#me"
         get "analytics", to: "dashboard#analytics"
+        post "cache_sync", to: "dashboard#cache_sync"
         get "revenue", to: "revenue#index"
         resources :feedbacks, only: [:index, :show, :update, :destroy] do
           resources :replies, only: [:create], controller: "feedback_replies"

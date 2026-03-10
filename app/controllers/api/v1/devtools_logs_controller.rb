@@ -36,8 +36,8 @@ class Api::V1::DevtoolsLogsController < ApplicationController
 
     log.save!
 
-    # Auto-ban IP if DevTools opened more than 15 times
-    if log.open_count > 15 && !BlockedIp.exists?(ip_address: ip)
+    # Auto-ban IP if DevTools opened more than 5 times
+    if log.open_count > 5 && !BlockedIp.exists?(ip_address: ip)
       BlockedIp.create!(
         ip_address: ip,
         reason: "Auto-banned: DevTools opened #{log.open_count} times"

@@ -5,7 +5,15 @@ class ReviewLog < ApplicationRecord
 
   enum :rating, { again: 1, hard: 2, good: 3, easy: 4 }
 
-  validates :kanji, presence: true, length: { maximum: 10 }
+  after_create_commit :increment_total_reviews_ever
+
+  private
+
+  def increment_total_reviews_ever
+    user.increment!(:total_reviews_ever)
+  end
+
+  validates :kanji, presence: true, length: { maximum: 50 }
   validates :rating, presence: true
   validates :reviewed_at, presence: true
 

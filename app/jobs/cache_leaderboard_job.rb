@@ -22,38 +22,35 @@ class CacheLeaderboardJob < ApplicationJob
   private
 
   def build_leaderboard
-    # Total reviews per user (main ranking metric)
-    review_counts = ReviewLog.group(:user_id).count
+    # Dùng total_reviews_ever thay vì query review_logs trực tiếp
+    # → không bị ảnh hưởng khi user xóa data để học lại
+    active_users = User.where(is_banned: false)
+                       .where("total_reviews_ever > 0")
+                       .select(:id, :uid, :display_name, :photo_url, :is_premium, :premium_until,
+                               :srs_cards_count, :total_reviews_ever)
 
-    # Only rank users who have at least 1 review
-    active_user_ids = review_counts.keys
-    return [] if active_user_ids.empty?
+    return [] if active_users.empty?
 
-    # SRS cards count per user
-    srs_counts = SrsCard.where(user_id: active_user_ids).group(:user_id).count
+    active_user_ids = active_users.map(&:id)
 
     # Roadmap days completed per user
     roadmap_counts = RoadmapDayProgress.where(user_id: active_user_ids).group(:user_id).count
 
-    # Current streak (consecutive days with reviews ending today or yesterday)
+    # Current streak (vẫn cần query review_logs vì cần biết ngày gần nhất)
     streaks = calculate_streaks(active_user_ids)
 
-    # Fetch user info
-    users = User.where(id: active_user_ids, is_banned: false)
-                .select(:id, :uid, :display_name, :photo_url, :is_premium, :premium_until)
-                .index_by(&:id)
+    users_by_id = active_users.index_by(&:id)
 
-    # Build entries sorted by review count desc
+    # Build entries sorted by total_reviews_ever desc
     entries = active_user_ids
-      .select { |uid| users[uid].present? }
       .map do |user_id|
-        user = users[user_id]
+        user = users_by_id[user_id]
         {
           uid: user.uid,
           displayName: user.display_name || "Anonymous",
           photoURL: user.photo_url,
-          totalReviews: review_counts[user_id] || 0,
-          srsCards: srs_counts[user_id] || 0,
+          totalReviews: user.total_reviews_ever,
+          srsCards: user.srs_cards_count,
           roadmapDays: roadmap_counts[user_id] || 0,
           streakDays: streaks[user_id] || 0,
           isPremium: user.premium?

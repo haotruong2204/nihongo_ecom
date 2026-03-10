@@ -39,6 +39,7 @@ class Api::V1::Admins::BlockedIpsController < Api::V1::BaseController
   def destroy
     ip = BlockedIp.find(params[:id])
     unbanned_users = unban_associated_users(ip.ip_address)
+    DevtoolsLog.where(ip_address: ip.ip_address).update_all(open_count: 0)
     ip.destroy!
 
     message = "IP #{ip.ip_address} has been unblocked."

@@ -53,12 +53,12 @@ class Api::V1::LeaderboardController < ApplicationController
   end
 
   def build_current_user_stats(user, top_users)
-    total_reviews = user.review_logs.count
-    srs_cards = user.srs_cards.count
+    total_reviews = user.total_reviews_ever
+    srs_cards = user.srs_cards_count
     roadmap_days = user.roadmap_day_progresses.count
 
-    # Calculate rank: count users with more reviews + 1
-    rank = ReviewLog.group(:user_id).having("COUNT(*) > ?", total_reviews).count.size + 1
+    # Rank dựa trên total_reviews_ever
+    rank = User.where("total_reviews_ever > ?", total_reviews).count + 1
 
     {
       "rank" => rank,
