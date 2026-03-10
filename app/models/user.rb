@@ -24,6 +24,7 @@ class User < ApplicationRecord
   has_many :page_views, dependent: :destroy
   has_many :custom_roadmaps, dependent: :destroy
   has_many :custom_roadmap_day_progresses, dependent: :destroy
+  has_many :push_subscriptions, dependent: :destroy
 
   validates :uid, presence: true, uniqueness: true, length: { maximum: 128 }
   validates :email, presence: true, uniqueness: true, length: { maximum: 255 }

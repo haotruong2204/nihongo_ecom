@@ -110,3 +110,5 @@ gem "sidekiq-cron"
 
 # IP geolocation
 gem "maxminddb"
+
+gem "webpush"
