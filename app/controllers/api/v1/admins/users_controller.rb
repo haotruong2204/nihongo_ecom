@@ -2,8 +2,9 @@
 
 class Api::V1::Admins::UsersController < Api::V1::BaseController
   include Pagy::Backend
+  include UserCounterSync
 
-  before_action :set_user, only: [:show, :update, :destroy]
+  before_action :set_user, only: [:show, :update, :destroy, :recalculate_counters]
 
   def index
     q = User.ransack(params[:q])
@@ -88,8 +89,18 @@ class Api::V1::Admins::UsersController < Api::V1::BaseController
   end
 
   def destroy
+    REDIS.del("user_stats:#{@user.id}")
     @user.destroy!
     response_success({ code: 200, message: I18n.t("api.common.delete_success"), status: :ok })
+  end
+
+  def recalculate_counters
+    sync_user_counters(@user)
+    response_success({
+      code: 200,
+      message: "Đã đồng bộ số liệu cho user ##{@user.id}",
+      status: :ok
+    })
   end
 
   private

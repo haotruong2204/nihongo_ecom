@@ -2,6 +2,7 @@
 
 class Api::V1::Admins::UserSrsCardsController < Api::V1::BaseController
   include Pagy::Backend
+  include UserCounterSync
 
   before_action :set_user
   before_action :set_card, only: [:destroy, :reset]
@@ -29,6 +30,7 @@ class Api::V1::Admins::UserSrsCardsController < Api::V1::BaseController
 
   def destroy
     @card.destroy!
+    sync_user_counters(@user)
     response_success({ code: 200, message: I18n.t("api.common.delete_success"), status: :ok })
   end
 

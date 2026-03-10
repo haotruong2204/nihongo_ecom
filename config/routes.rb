@@ -85,6 +85,9 @@ Rails.application.routes.draw do
         resources :blocked_ips, only: [:index, :create, :destroy]
         resources :chat_rooms, only: [:index, :update], param: :uid
         resources :users, only: [:index, :show, :update, :destroy] do
+          member do
+            post :recalculate_counters
+          end
           resources :srs_cards, only: [:index, :destroy], controller: "user_srs_cards" do
             member do
               patch :reset

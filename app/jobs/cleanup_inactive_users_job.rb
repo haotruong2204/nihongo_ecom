@@ -21,6 +21,12 @@ class CleanupInactiveUsersJob < ApplicationJob
       deleted_srs += SrsCard.where(user_id: batch_ids).delete_all
       deleted_reviews += ReviewLog.where(user_id: batch_ids).delete_all
       deleted_roadmap += RoadmapDayProgress.where(user_id: batch_ids).delete_all
+
+      # Sync counter cache columns (delete_all bypasses AR callbacks)
+      batch_ids.each do |uid|
+        User.reset_counters(uid, :srs_cards, :review_logs)
+        REDIS.del("user_stats:#{uid}")
+      end
     end
 
     Rails.logger.info(
