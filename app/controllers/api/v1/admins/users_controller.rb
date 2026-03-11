@@ -32,6 +32,8 @@ class Api::V1::Admins::UsersController < Api::V1::BaseController
     else
       stats = {
         srs_cards_count: @user.srs_cards.count,
+        kanji_srs_cards_count: @user.srs_cards.where(reading: [nil, ""]).count,
+        vocab_srs_cards_count: @user.srs_cards.where.not(reading: [nil, ""]).count,
         review_logs_count: @user.review_logs.count,
         vocab_sets_count: @user.vocab_sets.count,
         custom_vocab_items_count: @user.custom_vocab_items.count,

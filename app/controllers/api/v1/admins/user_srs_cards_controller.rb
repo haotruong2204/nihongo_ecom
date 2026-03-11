@@ -68,8 +68,14 @@ class Api::V1::Admins::UserSrsCardsController < Api::V1::BaseController
 
   def filtered_scope
     scope = @user.srs_cards
-    status = params[:status].to_s
 
+    scope = case params[:card_type].to_s
+            when "kanji" then scope.where(reading: [nil, ""])
+            when "vocab" then scope.where.not(reading: [nil, ""])
+            else scope
+            end
+
+    status = params[:status].to_s
     if status == "overdue"
       scope.where(due_date: ..Time.current)
     elsif STATUS_MAP.key?(status)
