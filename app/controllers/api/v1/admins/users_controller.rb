@@ -10,6 +10,10 @@ class Api::V1::Admins::UsersController < Api::V1::BaseController
     q = User.ransack(params[:q])
     results = q.sorts.empty? ? q.result.order(created_at: :desc) : q.result
 
+    if params[:ip].present?
+      results = results.joins(:login_activities).where(login_activities: { ip_address: params[:ip] }).distinct
+    end
+
     pagy, users = pagy(results, limit: params[:per_page] || 20)
 
     response_success({

@@ -9,6 +9,9 @@ class TangoLessonProgress < ApplicationRecord
   validates :known_count, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :total_count, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
 
+  attribute :modes, default: {}
+  attribute :available_modes, default: []
+
   scope :completed, -> { where(completed: true) }
   scope :for_book, ->(book_id) { where(book_id: book_id) }
 

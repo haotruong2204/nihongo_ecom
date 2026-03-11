@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_10_120000) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_11_100001) do
   create_table "admin_notifications", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "title", null: false
     t.text "body"
@@ -291,6 +291,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_10_120000) do
     t.datetime "last_studied_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.json "modes"
+    t.json "available_modes"
     t.index ["user_id", "book_id", "lesson_id"], name: "idx_tango_progress_unique", unique: true
     t.index ["user_id", "book_id"], name: "idx_tango_progress_user_book"
     t.index ["user_id"], name: "index_tango_lesson_progresses_on_user_id"
