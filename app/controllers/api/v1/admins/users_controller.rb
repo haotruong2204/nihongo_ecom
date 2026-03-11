@@ -65,9 +65,9 @@ class Api::V1::Admins::UsersController < Api::V1::BaseController
         @user.update!(jti: SecureRandom.uuid)
       end
 
-      # If admin just unbanned user → reset conflict count
+      # If admin just unbanned user → clear all login history so device count resets from scratch
       if was_banned && !@user.is_banned
-        @user.login_activities.conflicts.update_all(session_conflict: false)
+        @user.login_activities.delete_all
       end
 
       # If admin just upgraded user to premium → reset slot locks + send notification + record revenue
