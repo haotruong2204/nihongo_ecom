@@ -34,7 +34,7 @@ class Api::V1::Users::OmniauthsController < Api::V1::UserBaseController
 
     # Band khi IP thứ 4 hoặc thiết bị thứ 4 xuất hiện
     if is_conflict && !user.banned?
-      user.update!(is_banned: true, banned_reason: "Có dấu hiệu vi phạm chính sách về share tài khoản")
+      user.update!(is_banned: true, banned_reason: "Có dấu hiệu vi phạm chính sách về tài khoản (chỉ 2 thiết bị)")
     end
 
     # Generate new token with fresh jti
