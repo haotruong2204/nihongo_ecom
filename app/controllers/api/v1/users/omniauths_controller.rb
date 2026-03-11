@@ -32,8 +32,8 @@ class Api::V1::Users::OmniauthsController < Api::V1::UserBaseController
       **geoip_attrs(current_ip)
     )
 
-    # Band khi IP thứ 4 hoặc thiết bị thứ 4 xuất hiện
-    if is_conflict && !user.banned?
+    # Chỉ band tài khoản premium khi vượt quá 3 thiết bị
+    if is_conflict && !user.banned? && user.premium?
       user.update!(is_banned: true, banned_reason: "Có dấu hiệu vi phạm chính sách về tài khoản (chỉ 2 thiết bị)")
     end
 
