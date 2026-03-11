@@ -13,7 +13,7 @@ class Api::V1::Users::OmniauthsController < Api::V1::UserBaseController
 
     user = User.create_user_for_google(user_data)
 
-    current_device = parse_device_info(request.user_agent)
+    current_device = request.headers["X-Device-ID"].presence || parse_device_info(request.user_agent)
     current_ip = request.remote_ip
 
     known_devices = user.login_activities.pluck(:device_info).uniq
