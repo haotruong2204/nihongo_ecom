@@ -51,5 +51,10 @@ class ExpirePremiumJob < ApplicationJob
       kanji_slots_locked: user.srs_cards.where(reading: [nil, ""]).count >= FREE_KANJI_LIMIT,
       vocab_slots_locked: user.srs_cards.where.not(reading: [nil, ""]).count >= FREE_VOCAB_LIMIT
     )
+
+    # Delete all active-learning vocab sets and custom vocab items
+    deleted_sets = user.vocab_sets.delete_all
+    deleted_items = user.custom_vocab_items.delete_all
+    Rails.logger.info("[ExpirePremiumJob] user##{user.id}: removed #{deleted_sets} vocab set(s), #{deleted_items} custom vocab item(s)")
   end
 end
