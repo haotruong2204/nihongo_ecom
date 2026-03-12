@@ -27,6 +27,12 @@ Sidekiq.configure_server do |config|
         "queue" => "default",
         "description" => "Set is_premium=false for users whose premium_until has passed"
       },
+      "premium_expiry_reminder" => {
+        "cron" => "0 9 * * *", # Every day at 9:00 AM
+        "class" => "PremiumExpiryReminderJob",
+        "queue" => "default",
+        "description" => "Send renewal reminder email to users expiring in 2 days"
+      },
       "cache_leaderboard" => {
         "cron" => "*/10 * * * *", # Every 10 minutes
         "class" => "CacheLeaderboardJob",

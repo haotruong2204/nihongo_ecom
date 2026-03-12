@@ -1,0 +1,37 @@
+<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
+  <p>Xin chào <strong><%= @user.display_name %></strong>,</p>
+
+  <p>
+    Tài khoản Premium của bạn sẽ hết hạn sau <strong><%= @days_left %> ngày nữa</strong>
+    (ngày <strong><%= @user.premium_until.strftime("%d/%m/%Y") %></strong>).
+  </p>
+
+  <p>
+    Sau khi hết hạn, dữ liệu học của bạn sẽ bị giới hạn về ngưỡng tài khoản miễn phí
+    (50 thẻ Kanji, 100 thẻ Từ vựng). Hãy gia hạn sớm để giữ lại toàn bộ data học xuyên suốt nhé!
+  </p>
+
+  <div style="background-color: #ebf8ff; border-left: 4px solid #2c5282; padding: 16px; margin: 20px 0; border-radius: 4px;">
+    <p style="margin: 0 0 12px; font-weight: bold; font-size: 16px;">💳 Thông tin gia hạn</p>
+
+    <p style="margin: 4px 0;">📦 <strong>Gói tháng:</strong> 29,000đ / tháng</p>
+    <p style="margin: 4px 0;">📦 <strong>Gói năm:</strong> 199,000đ / năm</p>
+
+    <hr style="border: none; border-top: 1px solid #bee3f8; margin: 12px 0;">
+
+    <p style="margin: 4px 0;">🏦 <strong>Ngân hàng:</strong> VIETCOMBANK</p>
+    <p style="margin: 4px 0;">👤 <strong>Chủ TK:</strong> TRUONG VAN HAO</p>
+    <p style="margin: 4px 0;">💳 <strong>STK:</strong> 0491000097047</p>
+    <p style="margin: 4px 0;">📝 <strong>Nội dung CK:</strong> NHAIKANJI <%= @user.email %></p>
+  </div>
+
+  <p>
+    Sau khi chuyển khoản, nếu chưa được nâng cấp tự động, <br>
+    bạn nhắn lại qua mục <strong>Nhắn tin</strong> trên website để mình kích hoạt gói nhé! ✨
+  </p>
+
+  <p style="margin-top: 24px; font-size: 14px; color: #718096;">
+    Trân trọng,<br>
+    Thợ code học tiếng Nhật
+  </p>
+</div>
