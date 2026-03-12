@@ -29,7 +29,9 @@ Rails.application.routes.draw do
         post "auth_google", to: "omniauths#auth_google"
         get "me", to: "dashboard#me"
         resource :setting, only: [:show, :update]
-        resources :srs_cards, only: [:index, :show, :create, :update, :destroy]
+        resources :srs_cards, only: [:index, :show, :create, :update, :destroy] do
+          collection { get :summary }
+        end
         resources :review_logs, only: [:index, :show, :create] do
           collection do
             get :stats

@@ -3,7 +3,27 @@
 class Api::V1::Users::SrsCardsController < Api::V1::UserBaseController
   before_action :set_srs_card, only: [:show, :update, :destroy]
   before_action :require_srs_card, only: [:show, :update]
-  before_action :sync_slots_locked_on_expiry
+  before_action :sync_slots_locked_on_expiry, except: [:summary]
+
+  MATURE_THRESHOLD = 21
+
+  # GET /api/v1/users/srs_cards/summary
+  # Trả aggregate counts — không serialize từng card, scale tới 100k+ cards
+  def summary
+    cards = accessible_srs_cards
+    now   = Time.current
+
+    kanji_scope = cards.where(reading: [nil, ""])
+    vocab_scope = cards.where.not(reading: [nil, ""])
+
+    render json: {
+      success: true,
+      data: {
+        kanji: card_summary(kanji_scope, now),
+        vocab: card_summary(vocab_scope, now)
+      }
+    }
+  end
 
   def index
     scope = accessible_srs_cards
@@ -120,6 +140,20 @@ class Api::V1::Users::SrsCardsController < Api::V1::UserBaseController
   # For free users: oldest FREE_KANJI_LIMIT kanji + oldest FREE_VOCAB_LIMIT vocab.
   # "Oldest first" so data accumulated before premium expires is the locked portion,
   # not the data the user had as a free user.
+  def card_summary(scope, now)
+    review_scope = scope.where(state: "review")
+    {
+      total:       scope.count,
+      due_today:   scope.where("due_date <= ?", now).count,
+      new_cards:   scope.where(state: "new_card").count,
+      learning:    scope.where(state: %w[learning relearning]).count,
+      review:      review_scope.count,
+      young_cards: review_scope.where("interval < ?", MATURE_THRESHOLD).count,
+      mature_cards: review_scope.where("interval >= ?", MATURE_THRESHOLD).count,
+      next_due_at: scope.where("due_date > ?", now).minimum(:due_date)
+    }
+  end
+
   def accessible_srs_cards
     return current_user.srs_cards if current_user.premium?
 
