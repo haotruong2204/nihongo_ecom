@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_11_100001) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_12_100001) do
   create_table "admin_notifications", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "title", null: false
     t.text "body"
@@ -166,6 +166,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_11_100001) do
     t.json "sections", null: false
     t.datetime "taken_at", null: false
     t.datetime "created_at", null: false
+    t.string "test_id", limit: 50
+    t.string "section", limit: 30
+    t.index ["test_id"], name: "index_jlpt_test_results_on_test_id"
     t.index ["user_id", "level"], name: "index_jlpt_test_results_on_user_id_and_level"
     t.index ["user_id", "taken_at"], name: "index_jlpt_test_results_on_user_id_and_taken_at"
     t.index ["user_id"], name: "index_jlpt_test_results_on_user_id"

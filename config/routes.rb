@@ -47,6 +47,7 @@ Rails.application.routes.draw do
           end
         end
         resources :tango_lesson_progresses, only: [:index, :create]
+        resources :jlpt_test_results, only: [:index, :create]
         resources :feedbacks, only: [:index, :show, :create]
         resources :notifications, only: [:index], controller: "notifications" do
           collection do
