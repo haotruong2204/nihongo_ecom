@@ -148,8 +148,8 @@ class Api::V1::Users::SrsCardsController < Api::V1::UserBaseController
       new_cards:   scope.where(state: "new_card").count,
       learning:    scope.where(state: %w[learning relearning]).count,
       review:      review_scope.count,
-      young_cards: review_scope.where("interval < ?", MATURE_THRESHOLD).count,
-      mature_cards: review_scope.where("interval >= ?", MATURE_THRESHOLD).count,
+      young_cards: review_scope.where("srs_cards.interval < ?", MATURE_THRESHOLD).count,
+      mature_cards: review_scope.where("srs_cards.interval >= ?", MATURE_THRESHOLD).count,
       next_due_at: scope.where("due_date > ?", now).minimum(:due_date)
     }
   end
