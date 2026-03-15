@@ -4,6 +4,7 @@ class Api::V1::Admins::UserLoginActivitiesController < Api::V1::BaseController
   include Pagy::Backend
 
   before_action :set_user
+  before_action :set_login_activity, only: [:destroy]
 
   def index
     q = @user.login_activities.ransack(params[:q])
@@ -18,10 +19,21 @@ class Api::V1::Admins::UserLoginActivitiesController < Api::V1::BaseController
                      })
   end
 
+  def destroy
+    @login_activity.destroy!
+    response_success({ code: 200, message: I18n.t("api.common.success"), status: :ok })
+  end
+
   private
 
   def set_user
     @user = User.find(params[:user_id])
+  rescue ActiveRecord::RecordNotFound
+    not_found
+  end
+
+  def set_login_activity
+    @login_activity = @user.login_activities.find(params[:id])
   rescue ActiveRecord::RecordNotFound
     not_found
   end

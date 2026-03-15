@@ -110,7 +110,7 @@ Rails.application.routes.draw do
           resources :tango_lesson_progresses, only: [:index], controller: "user_tango_lesson_progresses"
           resources :jlpt_test_results, only: [:index], controller: "user_jlpt_test_results"
           resources :feedbacks, only: [:index], controller: "user_feedbacks"
-          resources :login_activities, only: [:index], controller: "user_login_activities"
+          resources :login_activities, only: [:index, :destroy], controller: "user_login_activities"
           resources :user_devices, only: [:index, :destroy], controller: "user_user_devices"
           resources :page_views, only: [:index], controller: "user_page_views"
           resources :devtools_logs, only: [:index], controller: "devtools_logs"
