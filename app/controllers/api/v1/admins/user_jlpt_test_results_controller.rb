@@ -6,7 +6,10 @@ class Api::V1::Admins::UserJlptTestResultsController < Api::V1::BaseController
   before_action :set_user
 
   def index
-    pagy, results = pagy(@user.jlpt_test_results.order(taken_at: :desc), limit: params[:per_page] || 20)
+    scope = @user.jlpt_test_results.order(taken_at: :desc)
+    scope = scope.where(level: params[:level]) if params[:level].present?
+    scope = scope.where(passed: params[:passed] == "true") if params[:passed].present?
+    pagy, results = pagy(scope, limit: params[:per_page] || 20)
 
     response_success({
                        code: 200,

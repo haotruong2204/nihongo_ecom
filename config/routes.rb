@@ -48,6 +48,7 @@ Rails.application.routes.draw do
             put :sync_items
           end
         end
+        resources :user_devices, only: [:index, :destroy]
         resources :tango_lesson_progresses, only: [:index, :create]
         resources :jlpt_test_results, only: [:index, :create]
         resources :feedbacks, only: [:index, :show, :create]
@@ -110,6 +111,7 @@ Rails.application.routes.draw do
           resources :jlpt_test_results, only: [:index], controller: "user_jlpt_test_results"
           resources :feedbacks, only: [:index], controller: "user_feedbacks"
           resources :login_activities, only: [:index], controller: "user_login_activities"
+          resources :user_devices, only: [:index, :destroy], controller: "user_user_devices"
           resources :page_views, only: [:index], controller: "user_page_views"
           resources :devtools_logs, only: [:index], controller: "devtools_logs"
           resource :setting, only: [:show], controller: "user_settings"

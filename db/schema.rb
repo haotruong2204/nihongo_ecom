@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_12_100001) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_15_100001) do
   create_table "admin_notifications", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "title", null: false
     t.text "body"
@@ -301,6 +301,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_12_100001) do
     t.index ["user_id"], name: "index_tango_lesson_progresses_on_user_id"
   end
 
+  create_table "user_devices", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "device_id", null: false
+    t.string "device_name", default: "Unknown", null: false
+    t.datetime "last_seen_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "device_id"], name: "index_user_devices_on_user_id_and_device_id", unique: true
+    t.index ["user_id"], name: "index_user_devices_on_user_id"
+  end
+
   create_table "user_notifications", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "title", null: false
@@ -381,6 +392,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_12_100001) do
   add_foreign_key "roadmap_day_progresses", "users"
   add_foreign_key "srs_cards", "users"
   add_foreign_key "tango_lesson_progresses", "users"
+  add_foreign_key "user_devices", "users", on_delete: :cascade
   add_foreign_key "user_notifications", "feedbacks", on_delete: :cascade
   add_foreign_key "user_notifications", "users"
   add_foreign_key "user_settings", "users"

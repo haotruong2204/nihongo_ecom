@@ -45,6 +45,7 @@ class Api::V1::Admins::UsersController < Api::V1::BaseController
         tango_lesson_progresses_count: @user.tango_lesson_progresses.count,
         jlpt_test_results_count: @user.jlpt_test_results.count,
         login_activities_count: @user.login_activities.count,
+        user_devices_count: @user.user_devices.count,
         page_views_count: @user.page_views.count
       }
       learning_summary = build_learning_summary
